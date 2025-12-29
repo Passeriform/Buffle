@@ -21,18 +21,18 @@ type BlockOptions = {
 }
 
 const COLOR_MAPPING = {
-    [BlockValue.TWO]: "#FFE2DB",
-    [BlockValue.FOUR]: "#FFD1C3",
-    [BlockValue.EIGHT]: "#FFB8A4",
-    [BlockValue.SIXTEEN]: "#FF9E8A",
-    [BlockValue.THIRTY_TWO]: "#FF846E",
-    [BlockValue.SIXTY_FOUR]: "#FF6A52",
-    [BlockValue.ONE_TWENTY_EIGHT]: "#F2553C",
-    [BlockValue.TWO_FIFTY_SIX]: "#E1462F",
-    [BlockValue.FIVE_TWELVE]: "#C93A25",
-    [BlockValue.TEN_TWENTY_FOUR]: "#A8321F",
-    [BlockValue.TWENTY_FORTY_EIGHT]: "#7F2418",
-    [BlockValue.FORTY_NINETY_SIX]: "#56180F",
+    [BlockValue.TWO]: "#FFD6CC",
+    [BlockValue.FOUR]: "#FFB8A8",
+    [BlockValue.EIGHT]: "#FF9B84",
+    [BlockValue.SIXTEEN]: "#FF7E5E",
+    [BlockValue.THIRTY_TWO]: "#F96342",
+    [BlockValue.SIXTY_FOUR]: "#E84C2A",
+    [BlockValue.ONE_TWENTY_EIGHT]: "#CC3E22",
+    [BlockValue.TWO_FIFTY_SIX]: "#A8321F",
+    [BlockValue.FIVE_TWELVE]: "#832719",
+    [BlockValue.TEN_TWENTY_FOUR]: "#5E1D13",
+    [BlockValue.TWENTY_FORTY_EIGHT]: "#3D120B",
+    [BlockValue.FORTY_NINETY_SIX]: "#240A06",
 } satisfies Record<BlockValue, string>
 
 export class Block {
@@ -45,13 +45,7 @@ export class Block {
     }
 
     static from(block: Block, value?: number) {
-        const newBlock = structuredClone(block)
-
-        if (value) {
-            newBlock.value = value
-        }
-
-        return newBlock
+        return new Block(value ?? block.value, block.options)
     }
 
     private computeLayout(inLayout: Layout) {

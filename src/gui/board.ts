@@ -32,7 +32,7 @@ export class Board {
 
     constructor(options: Partial<BoardOptions> = {}) {
         this.options = {
-            background: "#D48F86",
+            background: "#6B3C33",
             margin: 0,
             max: 1600,
             min: 400,

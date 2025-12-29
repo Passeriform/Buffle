@@ -18,9 +18,8 @@ let totalScore = 0
 const gridDimensions = [4, 4] as [number, number]
 const blockMap = new SparseMatrix<Block>([], gridDimensions)
 
-
 // GUI components
-const score = new Text()
+const scoreText = new Text()
 const board = new Board({
     margin: 100,
     padding: 10,
@@ -100,7 +99,7 @@ const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) => {
     // Render
     const root = padLayout(rootLayout(ctx.canvas), 50)
     const [scoreSlot, boardSlot] = splitTop(root, 100)
-    score.withContent(`Score: ${totalScore}`).render(ctx, scoreSlot)
+    scoreText.withContent(`Score: ${totalScore}`).render(ctx, scoreSlot)
     const gridSlot = board.render(ctx, boardSlot)
     const blockSlots = grid.render(ctx, gridSlot)
     blockMap.forEach((block, index) => {
@@ -115,7 +114,7 @@ const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) => {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const ctx = createCanvas("root")
+    const ctx = createCanvas("root", "#2E1F1C")
     init()
     bindControls(document.body, update)
     draw(0, ctx)

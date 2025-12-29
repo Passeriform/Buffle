@@ -31,7 +31,7 @@ export class Text {
     constructor(options: Partial<TextOptions> = {}) {
         this.content = "Set content via withContent in render"
         this.options = {
-            color: "#4A2C23",
+            color: "#F3EDEB",
             font: "Quicksand",
             align: "center",
             baseline: "middle",

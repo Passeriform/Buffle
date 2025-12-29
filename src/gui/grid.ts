@@ -30,7 +30,7 @@ export class Grid {
 
     constructor(options: Partial<GridOptions> = {}) {
         this.options = {
-            background: "#E3B2A9",
+            background: "#5A2F28",
             dimensions: [4, 4],
             gap: 0,
             rounding: 0,
