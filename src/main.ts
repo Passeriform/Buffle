@@ -7,7 +7,7 @@ import { computeMatches } from './matcher'
 import { computeMoves } from './movement'
 import { createCanvas } from './utility/canvas'
 import { computeNextBlockValue } from './utility/difficulty'
-import { rootLayout, splitTop } from "./utility/layout"
+import { padLayout, rootLayout, splitTop } from "./utility/layout"
 import { SparseMatrix } from './utility/sparseMatrix'
 
 // Game state
@@ -16,11 +16,7 @@ let totalScore = 0
 
 // Tracking state
 const gridDimensions = [4, 4] as [number, number]
-const blockMap = new SparseMatrix([
-    [8, new Block(BlockValue.TWO, { padding: 20, rounding: 20 })],
-    [12, new Block(BlockValue.TWO, { padding: 20, rounding: 20 })],
-    [13, new Block(BlockValue.TWO, { padding: 20, rounding: 20 })],
-], gridDimensions)
+const blockMap = new SparseMatrix<Block>([], gridDimensions)
 
 
 // GUI components
@@ -35,6 +31,16 @@ const grid = new Grid({
     rounding: 20,
     dimensions: gridDimensions
 })
+const block = new Block(BlockValue.TWO, {
+    padding: 20,
+    rounding: 20,
+})
+
+const init = () => {
+    blockMap.set(8, Block.from(block))
+    blockMap.set(12, Block.from(block))
+    blockMap.set(13, Block.from(block))
+}
 
 // TODO: Add locks and queue for updating the game state
 // TODO: Add animation engine
@@ -82,7 +88,7 @@ const update = async (direction: Direction) => {
 
     blockMap.set(
         blockMap.randomUnusedIndex(),
-        new Block(computeNextBlockValue(blockMap)),
+        Block.from(block, computeNextBlockValue(blockMap)),
     )
 }
 
@@ -110,6 +116,7 @@ const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) => {
 
 document.addEventListener("DOMContentLoaded", () => {
     const ctx = createCanvas("root")
+    init()
     bindControls(document.body, update)
     draw(0, ctx)
 })

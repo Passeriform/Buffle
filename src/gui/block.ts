@@ -44,6 +44,16 @@ export class Block {
         return a.value === b.value
     }
 
+    static from(block: Block, value?: number) {
+        const newBlock = structuredClone(block)
+
+        if (value) {
+            newBlock.value = value
+        }
+
+        return newBlock
+    }
+
     private computeLayout(inLayout: Layout) {
         this.layoutComputationMemo = inLayout
     }
