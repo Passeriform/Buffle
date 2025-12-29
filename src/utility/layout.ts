@@ -23,5 +23,5 @@ export const padLayout = (layout: Layout, padding: number) => ({
 // TODO: Create Cassowary constraint resolver instead of this.
 export const splitTop = (layout: Layout, height: number) => [
     { ...layout, height },
-    { ...layout, top: height, height: layout.height - height },
+    { ...layout, top: layout.top + height, height: layout.height - height },
 ]

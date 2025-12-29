@@ -33,11 +33,11 @@ export class Board {
     constructor(options: Partial<BoardOptions> = {}) {
         this.options = {
             background: "#D48F86",
-            margin: 200,
+            margin: 0,
             max: 1600,
             min: 400,
-            padding: 10,
-            rounding: 20,
+            padding: 0,
+            rounding: 0,
             ...options,
         }
     }

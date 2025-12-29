@@ -54,8 +54,8 @@ export class Block {
         }
         this.value = value
         this.options = {
-            padding: 20,
-            rounding: 20,
+            padding: 0,
+            rounding: 0,
             ...options,
         }
     }

@@ -47,13 +47,16 @@ export class Text {
     }
 
     render(ctx: CanvasRenderingContext2D, inLayout: Layout) {
-        ctx.font = `bold ${inLayout.height}px ${this.options.font}`
+        this.computeLayout(inLayout)
+
+        ctx.font = `bold ${this.layoutComputationMemo!.height}px ${this.options.font}`
         ctx.textAlign = this.options.align
         ctx.textBaseline = this.options.baseline
+        ctx.fillStyle = this.options.color
         ctx.fillText(
             this.content,
-            inLayout.left + (inLayout.width / 2),
-            inLayout.top + (inLayout.height / 2),
+            this.layoutComputationMemo!.left + (this.layoutComputationMemo!.width / 2),
+            this.layoutComputationMemo!.top + (this.layoutComputationMemo!.height / 2),
         )
     }
 }

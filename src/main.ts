@@ -17,16 +17,24 @@ let totalScore = 0
 // Tracking state
 const gridDimensions = [4, 4] as [number, number]
 const blockMap = new SparseMatrix([
-    [8, new Block(BlockValue.TWO)],
-    [12, new Block(BlockValue.TWO)],
-    [13, new Block(BlockValue.TWO)],
+    [8, new Block(BlockValue.TWO, { padding: 20, rounding: 20 })],
+    [12, new Block(BlockValue.TWO, { padding: 20, rounding: 20 })],
+    [13, new Block(BlockValue.TWO, { padding: 20, rounding: 20 })],
 ], gridDimensions)
 
 
 // GUI components
 const score = new Text()
-const board = new Board()
-const grid = new Grid({ dimensions: gridDimensions })
+const board = new Board({
+    margin: 100,
+    padding: 10,
+    rounding: 20,
+})
+const grid = new Grid({
+    gap: 20,
+    rounding: 20,
+    dimensions: gridDimensions
+})
 
 // TODO: Add locks and queue for updating the game state
 // TODO: Add animation engine
@@ -84,7 +92,7 @@ const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) => {
     ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
     // Render
-    const root = rootLayout(ctx.canvas)
+    const root = padLayout(rootLayout(ctx.canvas), 50)
     const [scoreSlot, boardSlot] = splitTop(root, 100)
     score.withContent(`Score: ${totalScore}`).render(ctx, scoreSlot)
     const gridSlot = board.render(ctx, boardSlot)

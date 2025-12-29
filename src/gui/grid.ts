@@ -32,8 +32,8 @@ export class Grid {
         this.options = {
             background: "#E3B2A9",
             dimensions: [4, 4],
-            gap: 20,
-            rounding: 20,
+            gap: 0,
+            rounding: 0,
             ...options,
         }
     }
