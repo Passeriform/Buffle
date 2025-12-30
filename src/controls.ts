@@ -1,8 +1,10 @@
+import { ProcessQueue } from "./utility/processQueue"
+
 export enum Direction { UP, DOWN, LEFT, RIGHT }
 
-export const bindControls = (root: HTMLElement, handler: (action: Direction) => void) => {
-    const dragState = new Map<number, { x: number, y: number }>()
+// TODO: Add bindGamepad
 
+const bindKeyboard = (root: HTMLElement, handler: (action: Direction) => void, queue: ProcessQueue) => {
     root.addEventListener("keydown", (e) => {
         const direction = {
             "ArrowUp": Direction.UP,
@@ -20,9 +22,13 @@ export const bindControls = (root: HTMLElement, handler: (action: Direction) => 
         }[e.key]
 
         if (direction !== undefined) {
-            handler(direction)
+            queue.addTask(() => handler(direction))
         }
     })
+}
+
+const bindPointer = (root: HTMLElement, handler: (action: Direction) => void, queue: ProcessQueue) => {
+        const dragState = new Map<number, { x: number, y: number }>()
 
     root.addEventListener("pointerdown", (e) =>
         dragState.set(e.pointerId, { x: e.clientX, y: e.clientY })
@@ -41,9 +47,9 @@ export const bindControls = (root: HTMLElement, handler: (action: Direction) => 
         const dy = e.clientY - start.y
 
         if (Math.abs(dx) > Math.abs(dy))
-            handler(dx > 0 ? Direction.RIGHT : Direction.LEFT)
+            queue.addTask(() => handler(dx > 0 ? Direction.RIGHT : Direction.LEFT))
         else
-            handler(dy > 0 ? Direction.DOWN : Direction.UP)
+            queue.addTask(() => handler(dy > 0 ? Direction.DOWN : Direction.UP))
     })
 
     root.addEventListener("pointercancel", (e) =>
@@ -51,4 +57,13 @@ export const bindControls = (root: HTMLElement, handler: (action: Direction) => 
     )
 
     document.body.style.touchAction = "none"
+}
+
+export const bindControls = (root: HTMLElement, handler: (action: Direction) => void) => {
+    const processQueue = new ProcessQueue()
+
+    processQueue.run()
+
+    bindKeyboard(root, handler, processQueue)
+    bindPointer(root, handler, processQueue)
 }

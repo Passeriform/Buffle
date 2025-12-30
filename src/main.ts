@@ -41,6 +41,7 @@ const init = () => {
     blockMap.set(13, Block.from(block))
 }
 
+// TODO: Implement web-worker event handler
 // TODO: Add locks and queue for updating the game state
 // TODO: Add animation engine
 // TODO: Add game over screen
@@ -60,8 +61,6 @@ const update = async (direction: Direction) => {
 
         blocksMoved = true
 
-        // await new Promise(res => setTimeout(res, 1000))
-
         const { commit: match } = computeMatches(blockMap, direction, Block.equals)
 
         // TODO: Tie match with animation engine
@@ -75,8 +74,6 @@ const update = async (direction: Direction) => {
 
             totalScore += m.count
         })
-
-        // await new Promise(res => setTimeout(res, 1000))
     }
 
     if (!blocksMoved) {
@@ -89,10 +86,12 @@ const update = async (direction: Direction) => {
         blockMap.randomUnusedIndex(),
         Block.from(block, computeNextBlockValue(blockMap)),
     )
+
+    return
 }
 
 // Draw loop
-const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) => {
+const draw = (_: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) => {
     // Clear canvas
     ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
