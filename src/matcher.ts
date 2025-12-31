@@ -58,6 +58,7 @@ const getDirectionalMatches = <T>(
     return matches
 }
 
+// TODO: Fix double matching on primary and secondary overlaps
 const detectMatches = <T>(
     state: SparseMatrix<T>,
     direction: Direction,
@@ -104,5 +105,5 @@ export const computeMatches = <T>(
         return { merges, matches: [...primary, ...secondary] }
     }
 
-    return { commit }
+    return { matches: [...primary, ...secondary], commit }
 }

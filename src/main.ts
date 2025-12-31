@@ -49,17 +49,18 @@ const init = () => {
 
 // Update handler
 const update = async (direction: Direction) => {
-    let blocksMoved = false
+    let updatePerformed = false
+    let loopPerformed = false
 
-    while (true) {
+    do {
+        loopPerformed = false
+
         // TODO: Tie move with animation engine
         const { commit: move } = computeMoves(blockMap, direction)
 
-        if (!move()) {
-            break
-        }
+        const movedBlocks = move()
 
-        blocksMoved = true
+        loopPerformed ||= Boolean(movedBlocks)
 
         const { commit: match } = computeMatches(blockMap, direction, Block.equals)
 
@@ -74,9 +75,12 @@ const update = async (direction: Direction) => {
 
             totalScore += m.count
         })
-    }
 
-    if (!blocksMoved) {
+        loopPerformed ||= Boolean(merges.length)
+        updatePerformed ||= loopPerformed
+    } while (loopPerformed)
+
+    if (!updatePerformed) {
         return
     }
 
@@ -86,8 +90,6 @@ const update = async (direction: Direction) => {
         blockMap.randomUnusedIndex(),
         Block.from(block, computeNextBlockValue(blockMap)),
     )
-
-    return
 }
 
 // Draw loop
