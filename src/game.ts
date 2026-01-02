@@ -60,18 +60,18 @@ export const update = async (direction: Direction) => {
 
         loopPerformed ||= Boolean(movedBlocks)
 
-        const { commit: match } = computeMatches(blockMap, direction, Block.equals)
+        const { commit: match } = computeMatches(blockMap, direction, {
+            equalFn: Block.equals,
+            upgradeFn: (block) => block.upgrade(),
+        })
 
         // TODO: Tie match with animation engine
         const { merges } = match()
 
         merges.forEach((m) => {
             const block = blockMap.get(m.index)!
-            block.upgrade()
-            blockMap.delete(m.index)
-            blockMap.set(m.index, block)
 
-            totalScore += m.count
+            totalScore += block.value * m.count
         })
 
         loopPerformed ||= Boolean(merges.length)

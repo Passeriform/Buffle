@@ -58,7 +58,8 @@ const getDirectionalMatches = <T>(
     return matches
 }
 
-// TODO: Fix double matching on primary and secondary overlaps
+// FIXME: Fix double matching on primary and secondary overlaps
+// FIXME: Fix wrapped blocks matching in previous row and column
 const detectMatches = <T>(
     state: SparseMatrix<T>,
     direction: Direction,
@@ -87,9 +88,12 @@ type Merge = {
 export const computeMatches = <T>(
     state: SparseMatrix<T>,
     direction: Direction,
-    equalFn: (a: T, b: T) => boolean,
+    options: {
+        equalFn: (a: T, b: T) => boolean,
+        upgradeFn: (a: T) => void,
+    },
 ) => {
-    const { primary, secondary } = detectMatches(state, direction, equalFn, 3)
+    const { primary, secondary } = detectMatches(state, direction, options.equalFn, 3)
 
     const commit = () => {
         const merges: Merge[] = []
@@ -100,6 +104,8 @@ export const computeMatches = <T>(
             match.indices.slice(1).forEach((index) => {
                 state.delete(index)
             })
+
+            options.upgradeFn(state.get(match.indices[0])!)
         })
 
         return { merges, matches: [...primary, ...secondary] }
