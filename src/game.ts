@@ -1,4 +1,4 @@
-import { BlockMoveAnimation, BlocksMergeAnimation, BlockUpgradeAnimation } from "./animation"
+import { BlockMoveAnimation, BlocksMergeAnimation, BlockSpawnAnimation, BlockUpgradeAnimation, Easing } from "./animation"
 import { Direction } from "./controls"
 import { Block, BlockValue } from "./gui/block"
 import { Board } from "./gui/board"
@@ -17,7 +17,7 @@ let totalScore = 0
 const gridDimensions = [4, 4] as [number, number]
 const blockMap = new SparseMatrix<Block>([], gridDimensions)
 // TODO: Create AnimationSet and manage completion there.
-const animations = [] as (BlockMoveAnimation | BlocksMergeAnimation | BlockUpgradeAnimation)[]
+const animations = [] as (BlockMoveAnimation | BlocksMergeAnimation | BlockUpgradeAnimation | BlockSpawnAnimation)[]
 
 // GUI components
 const scoreText = new Text()
@@ -89,10 +89,11 @@ export const update = async (direction: Direction) => {
 
     totalMoves++
 
-    blockMap.set(
-        blockMap.randomUnusedIndex(),
-        Block.from(block, computeNextBlockValue(blockMap)),
-    )
+    const spawnIndex = blockMap.randomUnusedIndex()
+    blockMap.set(spawnIndex, Block.from(block, computeNextBlockValue(blockMap)))
+    const spawnAnimation = new BlockSpawnAnimation(400, Easing.EASE_IN_OUT, { index: spawnIndex })
+    animations.push(spawnAnimation)
+    await spawnAnimation.completed
 }
 
 // Draw loop
@@ -124,6 +125,10 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
             if (animation instanceof BlockUpgradeAnimation) {
                 return animation.metadata.index === index
             }
+
+            if (animation instanceof BlockSpawnAnimation) {
+                return animation.metadata.index === index
+            }
         })
 
         // Static render
@@ -147,6 +152,11 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
         }
 
         if (animation instanceof BlockUpgradeAnimation) {
+            blockMap.get(animation.metadata.index)!.options.opacity = animation.interpolate({ opacity: 0 }, { opacity: 1 }, delta).opacity
+            blockMap.get(animation.metadata.index)!.render(ctx, blockSlots[animation.metadata.index])
+        }
+
+        if (animation instanceof BlockSpawnAnimation) {
             blockMap.get(animation.metadata.index)!.options.opacity = animation.interpolate({ opacity: 0 }, { opacity: 1 }, delta).opacity
             blockMap.get(animation.metadata.index)!.render(ctx, blockSlots[animation.metadata.index])
         }
