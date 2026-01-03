@@ -96,7 +96,7 @@ export const computeMatches = <T>(
             return 0
         }
 
-        const mergeAnimations = [...primary, ...secondary].map(({ indices }) => new BlocksMergeAnimation(400, Easing.EASE_IN_OUT, { indices }))
+        const mergeAnimations = [...primary, ...secondary].map(({ indices }) => new BlocksMergeAnimation(200, Easing.EASE_IN_OUT, { indices }))
         animationCollection.push(...mergeAnimations)
         await Promise.allSettled(mergeAnimations.map((animation) => animation.completed))
 
@@ -108,7 +108,7 @@ export const computeMatches = <T>(
             options.upgradeFn(state.get(indices[0])!)
         })
 
-        const upgradeAnimations = [...primary, ...secondary].map(({ indices }) => new BlockUpgradeAnimation(400, Easing.EASE_IN_OUT, { index: indices[0] }))
+        const upgradeAnimations = [...primary, ...secondary].map(({ indices }) => new BlockUpgradeAnimation(100, Easing.EASE_IN_OUT, { index: indices[0] }))
         animationCollection.push(...upgradeAnimations)
         await Promise.allSettled(upgradeAnimations.map((animation) => animation.completed))
 

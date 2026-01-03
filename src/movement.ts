@@ -74,7 +74,7 @@ export const computeMoves = <T>(state: SparseMatrix<T>, direction: Direction) =>
             return 0
         }
 
-        const animations = moves.map(([before, after]) => new BlockMoveAnimation(400, Easing.EASE_IN_OUT, { before, after }))
+        const animations = moves.map(([before, after]) => new BlockMoveAnimation(100, Easing.EASE_IN_OUT, { before, after }))
         animationCollection.push(...animations)
         await Promise.allSettled(animations.map((animation) => animation.completed))
         animations.forEach((animation) => {

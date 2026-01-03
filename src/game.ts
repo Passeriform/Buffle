@@ -91,7 +91,7 @@ export const update = async (direction: Direction) => {
 
     const spawnIndex = blockMap.randomUnusedIndex()
     blockMap.set(spawnIndex, Block.from(block, computeNextBlockValue(blockMap)))
-    const spawnAnimation = new BlockSpawnAnimation(400, Easing.EASE_IN_OUT, { index: spawnIndex })
+    const spawnAnimation = new BlockSpawnAnimation(100, Easing.EASE_IN_OUT, { index: spawnIndex })
     animations.push(spawnAnimation)
     await spawnAnimation.completed
 }
