@@ -6,6 +6,7 @@ type TextOptions = {
     font: string
     align: CanvasTextAlign
     baseline: CanvasTextBaseline
+    opacity: number
 }
 
 export class Text {
@@ -36,6 +37,7 @@ export class Text {
             align: "center",
             baseline: "middle",
             margin: 0,
+            opacity: 1,
             ...options,
         }
     }
@@ -49,6 +51,7 @@ export class Text {
     render(ctx: CanvasRenderingContext2D, inLayout: Layout) {
         this.computeLayout(inLayout)
 
+        ctx.globalAlpha = this.options.opacity
         ctx.font = `bold ${this.layoutComputationMemo!.height}px ${this.options.font}`
         ctx.textAlign = this.options.align
         ctx.textBaseline = this.options.baseline

@@ -4,6 +4,7 @@ type GridOptions = {
     background: string
     dimensions: [number, number]
     gap: number
+    opacity: number
     rounding: number
 }
 
@@ -33,6 +34,7 @@ export class Grid {
             background: "#5A2F28",
             dimensions: [4, 4],
             gap: 0,
+            opacity: 1,
             rounding: 0,
             ...options,
         }
@@ -50,6 +52,7 @@ export class Grid {
     render(ctx: CanvasRenderingContext2D, inLayout: Layout) {
         this.computeLayout(inLayout)
 
+        ctx.globalAlpha = this.options.opacity
         ctx.fillStyle = this.options.background
         ctx.beginPath()
         this.layoutComputationMemo?.forEach(layout => {

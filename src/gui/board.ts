@@ -5,6 +5,7 @@ type BoardOptions = {
     margin: number
     max: number
     min: number
+    opacity: number
     padding: number
     rounding: number
 }
@@ -36,6 +37,7 @@ export class Board {
             margin: 0,
             max: 1600,
             min: 400,
+            opacity: 1,
             padding: 0,
             rounding: 0,
             ...options,
@@ -49,6 +51,7 @@ export class Board {
     render(ctx: CanvasRenderingContext2D, inLayout: Layout) {
         this.computeLayout(inLayout)
 
+        ctx.globalAlpha = this.options.opacity
         ctx.fillStyle = this.options.background
         ctx.beginPath()
         ctx.roundRect(

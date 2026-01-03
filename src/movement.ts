@@ -1,3 +1,4 @@
+import { BlockMoveAnimation, Easing } from "./animation"
 import { Direction } from "./controls"
 import { SortOrder, SparseMatrix } from "./utility/sparseMatrix"
 
@@ -68,9 +69,16 @@ export const computeMoves = <T>(state: SparseMatrix<T>, direction: Direction) =>
     }, sortOrderMapping[direction])
 
     // FIXME: Sometimes unfilled 0th index is reported no moves. Possible bug in move computation
-    const commit = () => {
-        moves.forEach(([before, after]) => {
-            state.updateKey(before, after)
+    const commit = async (animationCollection: BlockMoveAnimation[]) => {
+        if (!moves.length) {
+            return 0
+        }
+
+        const animations = moves.map(([before, after]) => new BlockMoveAnimation(400, Easing.EASE_IN_OUT, { before, after }))
+        animationCollection.push(...animations)
+        await Promise.allSettled(animations.map((animation) => animation.completed))
+        animations.forEach((animation) => {
+            state.updateKey(animation.metadata.before, animation.metadata.after)
         })
 
         return moves.length

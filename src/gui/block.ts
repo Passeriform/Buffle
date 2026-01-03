@@ -16,6 +16,7 @@ export enum BlockValue {
 }
 
 type BlockOptions = {
+    opacity: number
     padding: number
     rounding: number
 }
@@ -60,6 +61,7 @@ export class Block {
         this.options = {
             padding: 0,
             rounding: 0,
+            opacity: 1,
             ...options,
         }
     }
@@ -75,6 +77,7 @@ export class Block {
     render(ctx: CanvasRenderingContext2D, inLayout: Layout) {
         this.computeLayout(inLayout)
 
+        ctx.globalAlpha = this.options.opacity
         ctx.fillStyle = COLOR_MAPPING[this.value]
         ctx.beginPath()
         ctx.roundRect(

@@ -1,3 +1,4 @@
+import { BlocksMergeAnimation, BlockUpgradeAnimation, Easing } from "./animation";
 import { Direction } from "./controls";
 import { SortOrder, type SparseMatrix } from "./utility/sparseMatrix";
 
@@ -80,11 +81,6 @@ const detectMatches = <T>(
     return { primary, secondary }
 }
 
-type Merge = {
-    index: number,
-    count: number,
-}
-
 export const computeMatches = <T>(
     state: SparseMatrix<T>,
     direction: Direction,
@@ -95,20 +91,28 @@ export const computeMatches = <T>(
 ) => {
     const { primary, secondary } = detectMatches(state, direction, options.equalFn, 3)
 
-    const commit = () => {
-        const merges: Merge[] = []
+    const commit = async (animationCollection: (BlocksMergeAnimation | BlockUpgradeAnimation)[]) => {
+        if (!primary.length && !secondary.length) {
+            return 0
+        }
 
-        ;[...primary, ...secondary].forEach((match) => {
-            merges.push({ index: match.indices[0], count: match.indices.length })
+        const mergeAnimations = [...primary, ...secondary].map(({ indices }) => new BlocksMergeAnimation(400, Easing.EASE_IN_OUT, { indices }))
+        animationCollection.push(...mergeAnimations)
+        await Promise.allSettled(mergeAnimations.map((animation) => animation.completed))
 
-            match.indices.slice(1).forEach((index) => {
+        ;[...primary, ...secondary].forEach(({ indices }) => {
+            indices.slice(1).forEach((index) => {
                 state.delete(index)
             })
 
-            options.upgradeFn(state.get(match.indices[0])!)
+            options.upgradeFn(state.get(indices[0])!)
         })
 
-        return { merges, matches: [...primary, ...secondary] }
+        const upgradeAnimations = [...primary, ...secondary].map(({ indices }) => new BlockUpgradeAnimation(400, Easing.EASE_IN_OUT, { index: indices[0] }))
+        animationCollection.push(...upgradeAnimations)
+        await Promise.allSettled(upgradeAnimations.map((animation) => animation.completed))
+
+        return [...primary, ...secondary].length
     }
 
     return { matches: [...primary, ...secondary], commit }

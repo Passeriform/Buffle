@@ -1,13 +1,14 @@
-import { Direction } from './controls'
-import { Block, BlockValue } from './gui/block'
-import { Board } from './gui/board'
-import { Grid } from './gui/grid'
-import { Text } from './gui/text'
-import { computeMatches } from './matcher'
-import { computeMoves } from './movement'
-import { computeNextBlockValue } from './utility/difficulty'
+import { BlockMoveAnimation, BlocksMergeAnimation, BlockUpgradeAnimation } from "./animation"
+import { Direction } from "./controls"
+import { Block, BlockValue } from "./gui/block"
+import { Board } from "./gui/board"
+import { Grid } from "./gui/grid"
+import { Text } from "./gui/text"
+import { computeMatches } from "./matcher"
+import { computeMoves } from "./movement"
+import { computeNextBlockValue } from "./utility/difficulty"
 import { padLayout, rootLayout, splitTop } from "./utility/layout"
-import { SparseMatrix } from './utility/sparseMatrix'
+import { SparseMatrix } from "./utility/sparseMatrix"
 
 // Game state
 let totalMoves = 0
@@ -15,6 +16,8 @@ let totalScore = 0
 
 const gridDimensions = [4, 4] as [number, number]
 const blockMap = new SparseMatrix<Block>([], gridDimensions)
+// TODO: Create AnimationSet and manage completion there.
+const animations = [] as (BlockMoveAnimation | BlocksMergeAnimation | BlockUpgradeAnimation)[]
 
 // GUI components
 const scoreText = new Text()
@@ -45,6 +48,8 @@ export const init = () => {
     blockMap.set(13, Block.from(block))
 }
 
+// TODO: Cancel an update if previous takes too long
+
 // Update handler
 export const update = async (direction: Direction) => {
     let updatePerformed = false
@@ -53,28 +58,28 @@ export const update = async (direction: Direction) => {
     do {
         loopPerformed = false
 
-        // TODO: Tie move with animation engine
         const { commit: move } = computeMoves(blockMap, direction)
 
-        const movedBlocks = move()
+        // TODO: Remove any casting
+
+        const movedBlocks = await move(animations as any)
 
         loopPerformed ||= Boolean(movedBlocks)
 
-        const { commit: match } = computeMatches(blockMap, direction, {
+        const { matches, commit: match } = computeMatches(blockMap, direction, {
             equalFn: Block.equals,
             upgradeFn: (block) => block.upgrade(),
         })
 
         // TODO: Tie match with animation engine
-        const { merges } = match()
+        const mergedBlocks = await match(animations as any)
 
-        merges.forEach((m) => {
-            const block = blockMap.get(m.index)!
-
-            totalScore += block.value * m.count
+        matches.forEach((m) => {
+            const block = blockMap.get(m.indices[0])!
+            totalScore += block.value * m.indices.length
         })
 
-        loopPerformed ||= Boolean(merges.length)
+        loopPerformed ||= Boolean(mergedBlocks)
         updatePerformed ||= loopPerformed
     } while (loopPerformed)
 
@@ -106,7 +111,45 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
             throw Error(`Block undefined at index: ${index}`)
         }
 
-        block.render(ctx, blockSlots[index])
+        // TODO: Move to individual animations, expose as method.
+        const animation = animations.filter((animation) => !animation.isCompleted).find((animation) => {
+            if (animation instanceof BlockMoveAnimation) {
+                return animation.metadata.before === index || animation.metadata.after === index
+            }
+
+            if (animation instanceof BlocksMergeAnimation) {
+                return animation.metadata.indices.includes(index)
+            }
+
+            if (animation instanceof BlockUpgradeAnimation) {
+                return animation.metadata.index === index
+            }
+        })
+
+        // Static render
+        if (!animation) {
+            block.render(ctx, blockSlots[index])
+        }
+    })
+
+    // Interpolate animations
+    animations.filter((animation) => !animation.isCompleted).forEach((animation) => {
+        // TODO: Move to individual animations, expose as method.
+        if (animation instanceof BlockMoveAnimation) {
+            blockMap.get(animation.metadata.before)!.render(ctx, animation.interpolate(blockSlots[animation.metadata.before], blockSlots[animation.metadata.after], delta))
+        }
+
+        if (animation instanceof BlocksMergeAnimation) {
+            animation.metadata.indices.forEach((index) => {
+                blockMap.get(index)!.options.opacity = animation.interpolate({ opacity: 1 }, { opacity: 0 }, delta).opacity
+                blockMap.get(index)!.render(ctx, blockSlots[index])
+            })
+        }
+
+        if (animation instanceof BlockUpgradeAnimation) {
+            blockMap.get(animation.metadata.index)!.options.opacity = animation.interpolate({ opacity: 0 }, { opacity: 1 }, delta).opacity
+            blockMap.get(animation.metadata.index)!.render(ctx, blockSlots[animation.metadata.index])
+        }
     })
 
     // Recurse calls
