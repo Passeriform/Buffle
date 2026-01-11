@@ -1,23 +1,34 @@
-import { BlockMoveAnimation, BlocksMergeAnimation, BlockSpawnAnimation, BlockUpgradeAnimation, Easing } from "./animation"
+import { AnimationManager, Easing, Tween } from "./animation"
+import { BlockMergeAnimation, BlockMoveAnimation, BlockSpawnAnimation, BlockUpgradeAnimation } from "./animationList"
 import { Direction } from "./controls"
 import { Block, BlockValue } from "./gui/block"
 import { Board } from "./gui/board"
 import { Grid } from "./gui/grid"
 import { Text } from "./gui/text"
+import type { AnyWidget } from "./gui/widget"
 import { computeMatches } from "./matcher"
 import { computeMoves } from "./movement"
 import { computeNextBlockValue } from "./utility/difficulty"
 import { padLayout, rootLayout, splitTop } from "./utility/layout"
 import { SparseMatrix } from "./utility/sparseMatrix"
 
+// Config
+const gridDimensions = [4, 4] as [number, number]
+const moveTween = new Tween(200, Easing.EASE_IN_OUT)
+const mergeTween = new Tween(400, Easing.EASE_IN_OUT)
+const upgradeTween = new Tween(400, Easing.LINEAR)
+const spawnTween = new Tween(200, Easing.LINEAR)
+
 // Game state
 let totalMoves = 0
 let totalScore = 0
-
-const gridDimensions = [4, 4] as [number, number]
 const blockMap = new SparseMatrix<Block>([], gridDimensions)
-// TODO: Create AnimationSet and manage completion there.
-const animations = [] as (BlockMoveAnimation | BlocksMergeAnimation | BlockUpgradeAnimation | BlockSpawnAnimation)[]
+const animationManager: AnimationManager<AnyWidget,
+    | BlockMoveAnimation
+    | BlockMergeAnimation
+    | BlockUpgradeAnimation
+    | BlockSpawnAnimation
+> = new AnimationManager()
 
 // GUI components
 const scoreText = new Text()
@@ -43,9 +54,9 @@ const block = new Block(BlockValue.TWO, {
 
 // Initializer
 export const init = () => {
-    blockMap.set(8, Block.from(block))
-    blockMap.set(12, Block.from(block))
-    blockMap.set(13, Block.from(block))
+    blockMap.set(8, block.clone())
+    blockMap.set(12, block.clone())
+    blockMap.set(13, block.clone())
 }
 
 // TODO: Cancel an update if previous takes too long
@@ -60,9 +71,14 @@ export const update = async (direction: Direction) => {
 
         const { commit: move } = computeMoves(blockMap, direction)
 
-        // TODO: Remove any casting
-
-        const movedBlocks = await move(animations as any)
+        const movedBlocks = await move({
+            move: (from, to) => {
+                const block = blockMap.get(from)!
+                const animation = new BlockMoveAnimation(block, moveTween, { targetIndex: to })
+                animationManager.add(animation)
+                return animation
+            }
+        })
 
         loopPerformed ||= Boolean(movedBlocks)
 
@@ -71,8 +87,20 @@ export const update = async (direction: Direction) => {
             upgradeFn: (block) => block.upgrade(),
         })
 
-        // TODO: Tie match with animation engine
-        const mergedBlocks = await match(animations as any)
+        const mergedBlocks = await match({
+            merge: (index, to) => {
+                const block = blockMap.get(index)!
+                const animation = new BlockMergeAnimation(block, mergeTween, { targetIndex: to })
+                animationManager.add(animation)
+                return animation
+            },
+            upgrade: (index) => {
+                const block = blockMap.get(index)!
+                const animation = new BlockUpgradeAnimation(block, upgradeTween)
+                animationManager.add(animation)
+                return animation
+            }
+        })
 
         matches.forEach((m) => {
             const block = blockMap.get(m.indices[0])!
@@ -89,11 +117,11 @@ export const update = async (direction: Direction) => {
 
     totalMoves++
 
-    const spawnIndex = blockMap.randomUnusedIndex()
-    blockMap.set(spawnIndex, Block.from(block, computeNextBlockValue(blockMap)))
-    const spawnAnimation = new BlockSpawnAnimation(100, Easing.EASE_IN_OUT, { index: spawnIndex })
-    animations.push(spawnAnimation)
-    await spawnAnimation.completed
+    const spawnBlock = block.clone(computeNextBlockValue(blockMap))
+    blockMap.set(blockMap.randomUnusedIndex(), spawnBlock)
+    const animation = new BlockSpawnAnimation(spawnBlock, spawnTween)
+    animationManager.add(animation)
+    await animation.completed
 }
 
 // Draw loop
@@ -104,7 +132,7 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
     // Render
     const root = padLayout(rootLayout(ctx.canvas), 50)
     const [scoreSlot, boardSlot] = splitTop(root, 100)
-    scoreText.withContent(`Score: ${totalScore}`).render(ctx, scoreSlot)
+    scoreText.render(ctx, scoreSlot, `Score: ${totalScore}`)
     const gridSlot = board.render(ctx, boardSlot)
     const blockSlots = grid.render(ctx, gridSlot)
     blockMap.forEach((block, index) => {
@@ -112,54 +140,24 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
             throw Error(`Block undefined at index: ${index}`)
         }
 
-        // TODO: Move to individual animations, expose as method.
-        const animation = animations.filter((animation) => !animation.isCompleted).find((animation) => {
-            if (animation instanceof BlockMoveAnimation) {
-                return animation.metadata.before === index || animation.metadata.after === index
-            }
+        // Interpolate animations
+        // TODO: Move run logic into animationManager
+        if (animationManager.has(block)) {
+            const animations = animationManager.get(block)!
 
-            if (animation instanceof BlocksMergeAnimation) {
-                return animation.metadata.indices.includes(index)
-            }
-
-            if (animation instanceof BlockUpgradeAnimation) {
-                return animation.metadata.index === index
-            }
-
-            if (animation instanceof BlockSpawnAnimation) {
-                return animation.metadata.index === index
-            }
-        })
-
-        // Static render
-        if (!animation) {
-            block.render(ctx, blockSlots[index])
-        }
-    })
-
-    // Interpolate animations
-    animations.filter((animation) => !animation.isCompleted).forEach((animation) => {
-        // TODO: Move to individual animations, expose as method.
-        if (animation instanceof BlockMoveAnimation) {
-            blockMap.get(animation.metadata.before)!.render(ctx, animation.interpolate(blockSlots[animation.metadata.before], blockSlots[animation.metadata.after], delta))
-        }
-
-        if (animation instanceof BlocksMergeAnimation) {
-            animation.metadata.indices.forEach((index) => {
-                blockMap.get(index)!.options.opacity = animation.interpolate({ opacity: 1 }, { opacity: 0 }, delta).opacity
-                blockMap.get(index)!.render(ctx, blockSlots[index])
+            animations.forEach((animation) => {
+                if (animation instanceof BlockMoveAnimation) {
+                    animation.next(delta, {
+                        from: blockSlots[index],
+                        to: blockSlots[animation.metadata.targetIndex]
+                    })
+                } else {
+                    animation.next(delta)
+                }
             })
         }
 
-        if (animation instanceof BlockUpgradeAnimation) {
-            blockMap.get(animation.metadata.index)!.options.opacity = animation.interpolate({ opacity: 0 }, { opacity: 1 }, delta).opacity
-            blockMap.get(animation.metadata.index)!.render(ctx, blockSlots[animation.metadata.index])
-        }
-
-        if (animation instanceof BlockSpawnAnimation) {
-            blockMap.get(animation.metadata.index)!.options.opacity = animation.interpolate({ opacity: 0 }, { opacity: 1 }, delta).opacity
-            blockMap.get(animation.metadata.index)!.render(ctx, blockSlots[animation.metadata.index])
-        }
+        block.render(ctx, blockSlots[index])
     })
 
     // Recurse calls

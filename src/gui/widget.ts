@@ -37,6 +37,7 @@ export abstract class Widget<
 > {
     protected baseOptions: Options
     public layoutOverride?: InLayout<Chaining>
+    // TODO: Use proxy object on options for fine-grained mutation
     public optionsOverride: Partial<Options> = {}
 
     constructor(options: Partial<Options> = {}) {

@@ -20,6 +20,7 @@ type BlockOptions = WidgetOptions & {
     backgroundColor: string
 }
 
+// TODO: Give bevel 3d look to block
 export class Block extends Widget<BlockOptions> {
     private _value: BlockValue
 
@@ -81,7 +82,7 @@ export class Block extends Widget<BlockOptions> {
         return padLayout(layout, this.options.padding)
     }
 
-    get value() {
+    get value(): Readonly<BlockValue> {
         return this._value
     }
 

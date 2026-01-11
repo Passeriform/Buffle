@@ -1,4 +1,4 @@
-import { BlocksMergeAnimation, BlockUpgradeAnimation, Easing } from "./animation";
+import { Animation, type AnyAnimation } from "./animation";
 import { Direction } from "./controls";
 import { SortOrder, type SparseMatrix } from "./utility/sparseMatrix";
 
@@ -67,6 +67,7 @@ const detectMatches = <T>(
     equalFn: (a: T, b: T) => boolean,
     threshold: number,
 ) => {
+    // TODO: Infer primary and secondary directions by finding centroid of the sparseMatrix
     const primary = getDirectionalMatches(state, direction, equalFn).filter(({ indices }) => indices.length >= threshold)
 
     const secondaryDirection = {
@@ -81,36 +82,41 @@ const detectMatches = <T>(
     return { primary, secondary }
 }
 
-export const computeMatches = <T>(
+export const computeMatches = <T extends object>(
     state: SparseMatrix<T>,
     direction: Direction,
     options: {
+        // TODO: Remove callbacks after moving commit to game.ts
         equalFn: (a: T, b: T) => boolean,
         upgradeFn: (a: T) => void,
     },
 ) => {
     const { primary, secondary } = detectMatches(state, direction, options.equalFn, 3)
 
-    const commit = async (animationCollection: (BlocksMergeAnimation | BlockUpgradeAnimation)[]) => {
+    // TODO: Move out to game.ts
+    const commit = async (animationFactory: {
+        merge: (index: number, to: number) => AnyAnimation,
+        upgrade: (index: number) => AnyAnimation,
+    }) => {
         if (!primary.length && !secondary.length) {
             return 0
         }
 
-        const mergeAnimations = [...primary, ...secondary].map(({ indices }) => new BlocksMergeAnimation(200, Easing.EASE_IN_OUT, { indices }))
-        animationCollection.push(...mergeAnimations)
-        await Promise.allSettled(mergeAnimations.map((animation) => animation.completed))
+        // TODO: Extract creation of Tween outside and only await in here
+        const mergeAnimations = [...primary, ...secondary].flatMap(({ indices }) => indices.slice(1).map((index) => animationFactory.merge(index, indices[0])))
+        const upgradeAnimations = [...primary, ...secondary].map(({ indices }) => animationFactory.upgrade(indices[0]))
+
+        await Animation.waitCompletion(...mergeAnimations, ...upgradeAnimations)
 
         ;[...primary, ...secondary].forEach(({ indices }) => {
             indices.slice(1).forEach((index) => {
                 state.delete(index)
             })
-
-            options.upgradeFn(state.get(indices[0])!)
         })
 
-        const upgradeAnimations = [...primary, ...secondary].map(({ indices }) => new BlockUpgradeAnimation(100, Easing.EASE_IN_OUT, { index: indices[0] }))
-        animationCollection.push(...upgradeAnimations)
-        await Promise.allSettled(upgradeAnimations.map((animation) => animation.completed))
+        ;[...primary, ...secondary].forEach(({ indices }) => {
+            options.upgradeFn(state.get(indices[0])!)
+        })
 
         return [...primary, ...secondary].length
     }

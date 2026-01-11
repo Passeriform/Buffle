@@ -1,4 +1,4 @@
-import { BlockMoveAnimation, Easing } from "./animation"
+import type { AnyAnimation } from "./animation"
 import { Direction } from "./controls"
 import { SortOrder, SparseMatrix } from "./utility/sparseMatrix"
 
@@ -12,6 +12,7 @@ const sortOrderMapping = {
 type Move = [number, number]
 
 const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Direction) => {
+    // TODO: Simplify this switch
     switch (direction) {
         case Direction.UP: {
             let track = index
@@ -56,7 +57,7 @@ const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Directi
     }
 }
 
-export const computeMoves = <T>(state: SparseMatrix<T>, direction: Direction) => {
+export const computeMoves = <T extends object>(state: SparseMatrix<T>, direction: Direction) => {
     const copyState = new SparseMatrix<T>(state, state.dimensions)
 
     const moves: Move[] = []
@@ -68,17 +69,19 @@ export const computeMoves = <T>(state: SparseMatrix<T>, direction: Direction) =>
         }
     }, sortOrderMapping[direction])
 
+    // TODO: Move out to game.ts
     // FIXME: Sometimes unfilled 0th index is reported no moves. Possible bug in move computation
-    const commit = async (animationCollection: BlockMoveAnimation[]) => {
+    const commit = async (animationFactory: {
+        move: (from: number, to: number) => AnyAnimation,
+    }) => {
         if (!moves.length) {
             return 0
         }
 
-        const animations = moves.map(([before, after]) => new BlockMoveAnimation(100, Easing.EASE_IN_OUT, { before, after }))
-        animationCollection.push(...animations)
+        const animations = moves.map(([current, targetIndex]) => animationFactory.move(current, targetIndex))
         await Promise.allSettled(animations.map((animation) => animation.completed))
-        animations.forEach((animation) => {
-            state.updateKey(animation.metadata.before, animation.metadata.after)
+        moves.forEach(([before, after]) => {
+            state.updateKey(before, after)
         })
 
         return moves.length

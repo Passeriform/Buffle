@@ -48,15 +48,15 @@ export class SparseMatrix<V> {
         this.dirty = true
     }
 
-    get indices() {
+    get indices(): ReadonlyArray<[number, number]> {
         return [...this.keys].sort().map((fk) => [Math.floor(fk / this.dimensions[1]), fk % this.dimensions[1]] as const)
     }
 
-    get maxSize() {
+    get maxSize(): Readonly<number> {
         return this.dimensions[0] * this.dimensions[1]
     }
 
-    get size() {
+    get size(): Readonly<number> {
         return this.map.size
     }
 
