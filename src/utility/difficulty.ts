@@ -1,5 +1,5 @@
-import type { Block } from "../gui/block";
-import type { SparseMatrix } from "./sparseMatrix";
+import type { Block } from "../gui/block"
+import type { SparseMatrix } from "./sparseMatrix"
 
 // TODO: Make a difficulty engine that can scale the tiles based on board fullness, max tile, avg tile and median tile.
 

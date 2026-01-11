@@ -19,6 +19,10 @@ export abstract class Animation<W extends AnyWidget, DeferArgs extends Record<Pr
     public isCompleted: boolean = false
     private markCompleted?: () => void
 
+    static async waitCompletion(...animations: AnyAnimation[]) {
+        return Promise.allSettled(animations.map((animation) => animation.completed))
+    }
+
     protected interpolate<Shape extends Record<PropertyKey, number>>(from: Shape, to: Shape, delta: number) {
         if (this.isCompleted) {
             return to
@@ -52,11 +56,7 @@ export abstract class Animation<W extends AnyWidget, DeferArgs extends Record<Pr
         })
     }
 
-    abstract next(delta: number, ...deferArgs: ([DeferArgs] extends [never] ? [undefined?] : [DeferArgs])): void;
-
-    static async waitCompletion(...animations: AnyAnimation[]) {
-        return Promise.allSettled(animations.map((animation) => animation.completed))
-    }
+    abstract next(delta: number, ...deferArgs: ([DeferArgs] extends [never] ? [undefined?] : [DeferArgs])): void
 }
 
 export type AnyAnimation = Animation<AnyWidget, any>

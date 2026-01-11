@@ -1,6 +1,6 @@
-import { Animation, type AnyAnimation } from "./animation";
-import { Direction } from "./controls";
-import { SortOrder, type SparseMatrix } from "./utility/sparseMatrix";
+import { Animation, type AnyAnimation } from "./animation"
+import { Direction } from "./controls"
+import { SortOrder, type SparseMatrix } from "./utility/sparseMatrix"
 
 type Match = {
     direction: Direction,

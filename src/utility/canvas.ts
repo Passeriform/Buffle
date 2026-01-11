@@ -7,8 +7,8 @@ const fitCanvas = () => {
         throw Error("Canvas is not ready yet")
     }
 
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    canvas.width = canvas.offsetWidth
+    canvas.height = canvas.offsetHeight
 }
 
 export const createCanvas = (elementTag: string, background: string = "#FFFFFF") => {
