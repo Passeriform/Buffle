@@ -13,11 +13,12 @@ import { padLayout, rootLayout, splitVertical } from "./utility/layout"
 import { SparseMatrix } from "./utility/sparseMatrix"
 
 // Config
+const gameSpeed = 1
 const gridDimensions = [4, 4] as [number, number]
-const moveTween = new Tween(200, Easing.EASE_IN_OUT)
-const mergeTween = new Tween(400, Easing.EASE_IN_OUT)
-const upgradeTween = new Tween(400, Easing.LINEAR)
-const spawnTween = new Tween(200, Easing.LINEAR)
+const moveTween = new Tween(200 / gameSpeed, Easing.EASE_IN_OUT)
+const mergeTween = new Tween(300 / gameSpeed, Easing.EASE_IN_OUT)
+const upgradeTween = new Tween(200 / gameSpeed, Easing.LINEAR)
+const spawnTween = new Tween(200 / gameSpeed, Easing.LINEAR)
 
 // Game state
 let totalMoves = 0
@@ -55,6 +56,7 @@ const block = new Block(BlockValue.TWO, {
 
 // Initializer
 export const init = () => {
+    // TODO: Add spawn animation for init
     [8, 12, 13]
     .forEach((index) => {
         blockMap.set(index, block.clone())
