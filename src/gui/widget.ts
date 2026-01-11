@@ -56,15 +56,15 @@ export abstract class Widget<
 
     protected abstract getRenderLayouts(inLayout: InLayout<Chaining>): RenderLayout<Chaining>
 
-    protected abstract draw(ctx: CanvasRenderingContext2D, selfLayouts: RenderLayout<Chaining>, state?: State): void
+    protected abstract draw(ctx: CanvasRenderingContext2D, selfLayouts: RenderLayout<Chaining>, ...state: ([State] extends [never] ? [undefined?] : [State])): void
 
     protected abstract getSlots(selfLayouts: RenderLayout<Chaining>): SlotLayout<Chaining>
 
     abstract clone(): this
 
-    render(ctx: CanvasRenderingContext2D, inLayout: InLayout<Chaining>, state?: State) {
+    render(ctx: CanvasRenderingContext2D, inLayout: InLayout<Chaining>, ...state: ([State] extends [never] ? [undefined?] : [State])) {
         const renderLayouts = this.getRenderLayouts(this.layoutOverride ?? inLayout)
-        this.draw(ctx, renderLayouts, state)
+        this.draw(ctx, renderLayouts, ...state)
         const slots = this.getSlots(renderLayouts)!
 
         return slots
