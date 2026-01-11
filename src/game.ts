@@ -2,7 +2,7 @@ import { AnimationManager, Easing, Tween } from "./animation"
 import { BlockMergeAnimation, BlockMoveAnimation, BlockSpawnAnimation, BlockUpgradeAnimation } from "./animationList"
 import { Direction } from "./controls"
 import { Block, BlockValue } from "./gui/block"
-import { Board } from "./gui/board"
+import { ResponsiveContainer } from "./gui/responsiveContainer"
 import { Grid } from "./gui/grid"
 import { Text } from "./gui/text"
 import type { AnyWidget } from "./gui/widget"
@@ -31,8 +31,8 @@ const animationManager: AnimationManager<AnyWidget,
 > = new AnimationManager()
 
 // GUI components
-const scoreText = new Text()
-const board = new Board({
+const board = new ResponsiveContainer({
+    background: "#6B3C33",
     margin: 100,
     padding: 10,
     rounding: 20,
@@ -48,8 +48,6 @@ const block = new Block(BlockValue.TWO, {
 })
 
 // TODO: Implement web-worker event handler
-// TODO: Add locks and queue for updating the game state
-// TODO: Add animation engine
 // TODO: Add game over screen
 
 // Initializer
@@ -70,6 +68,7 @@ export const update = async (direction: Direction) => {
     do {
         loopPerformed = false
 
+        // Move blocks
         const { commit: move } = computeMoves(blockMap, direction)
 
         const movedBlocks = await move({
@@ -83,6 +82,7 @@ export const update = async (direction: Direction) => {
 
         loopPerformed ||= Boolean(movedBlocks)
 
+        // Merge blocks
         const { matches, commit: match } = computeMatches(blockMap, direction, {
             equalFn: Block.equals,
             upgradeFn: (block) => block.upgrade(),
@@ -118,6 +118,7 @@ export const update = async (direction: Direction) => {
 
     totalMoves++
 
+    // Spawn new block
     const spawnBlock = block.clone(computeNextBlockValue(blockMap))
     blockMap.set(blockMap.randomUnusedIndex(), spawnBlock)
     const animation = new BlockSpawnAnimation(spawnBlock, spawnTween)
@@ -143,6 +144,7 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
 
         // Interpolate animations
         // TODO: Move run logic into animationManager
+        // FIXME: Add animation ordering. Blocks are going over the upgraded one on merge
         if (animationManager.has(block)) {
             const animations = animationManager.get(block)!
 

@@ -1,16 +1,16 @@
 import { padLayout, type Layout } from "../utility/layout"
 import { Widget, type WidgetOptions } from "./widget"
 
-type BoardOptions = WidgetOptions & {
+type ResponsiveContainerOptions = WidgetOptions & {
     background: string
     max: number
     min: number
 }
 
-export class Board extends Widget<BoardOptions> {
-    constructor(options: Partial<BoardOptions> = {}) {
+export class ResponsiveContainer extends Widget<ResponsiveContainerOptions> {
+    constructor(options: Partial<ResponsiveContainerOptions> = {}) {
         super({
-            background: "#6B3C33",
+            background: "#6B3C3300",
             max: 1600,
             min: 400,
             ...options,
@@ -18,7 +18,7 @@ export class Board extends Widget<BoardOptions> {
     }
 
     override clone() {
-        return new Board(this.baseOptions) as this
+        return new ResponsiveContainer(this.baseOptions) as this
     }
 
     override getRenderLayouts(inLayout: Layout) {
