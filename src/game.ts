@@ -9,7 +9,7 @@ import type { AnyWidget } from "./gui/widget"
 import { computeMatches } from "./matcher"
 import { computeMoves } from "./movement"
 import { computeNextBlockValue } from "./utility/difficulty"
-import { padLayout, rootLayout, splitTop } from "./utility/layout"
+import { padLayout, rootLayout, splitVertical } from "./utility/layout"
 import { SparseMatrix } from "./utility/sparseMatrix"
 
 // Config
@@ -31,6 +31,9 @@ const animationManager: AnimationManager<AnyWidget,
 > = new AnimationManager()
 
 // GUI components
+const scoreText = new Text({
+    margin: 20,
+})
 const board = new ResponsiveContainer({
     background: "#6B3C33",
     margin: 100,
@@ -133,7 +136,7 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
 
     // Render
     const root = padLayout(rootLayout(ctx.canvas), 50)
-    const [scoreSlot, boardSlot] = splitTop(root, 100)
+    const [scoreSlot, boardSlot] = splitVertical(root, 120)
     scoreText.render(ctx, scoreSlot, `Score: ${totalScore}`)
     const gridSlot = board.render(ctx, boardSlot)
     const blockSlots = grid.render(ctx, gridSlot)
