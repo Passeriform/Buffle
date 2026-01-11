@@ -11,7 +11,7 @@ const fitCanvas = () => {
     canvas.height = canvas.offsetHeight;
 }
 
-export const createCanvas = (elementTag: string, backgroundColor: string = "#FFFFFF") => {
+export const createCanvas = (elementTag: string, background: string = "#FFFFFF") => {
     const root = document.getElementById(elementTag)
 
     if (!root) {
@@ -34,7 +34,7 @@ export const createCanvas = (elementTag: string, backgroundColor: string = "#FFF
         throw Error("Context not created")
     }
 
-    ctx.fillStyle = backgroundColor
+    ctx.fillStyle = background
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
     return ctx

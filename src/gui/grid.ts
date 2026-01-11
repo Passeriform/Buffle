@@ -7,6 +7,8 @@ type GridOptions = WidgetOptions & {
     gap: number
 }
 
+// TODO: Fix responsive screen issues
+
 export class Grid extends Widget<GridOptions, never, "1**"> {
     constructor(options: Partial<GridOptions> = {}) {
         super({

@@ -14,7 +14,7 @@ export class Text extends Widget<TextOptions, TextWidgetState> {
     constructor(options: Partial<TextOptions> = {}) {
         super({
             color: "#F3EDEB",
-            font: "Quicksand",
+            font: "Quicksand, sans-serif",
             align: "center",
             baseline: "middle",
             ...options,
@@ -51,6 +51,8 @@ export class Text extends Widget<TextOptions, TextWidgetState> {
             layout.left + (layout.width / 2),
             layout.top + (layout.height / 2),
         )
+
+        // TODO: Add cleanup to restore canvas state post-render
     }
 
     override getSlots(layout: Layout) {

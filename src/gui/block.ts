@@ -17,7 +17,7 @@ export enum BlockValue {
 }
 
 type BlockOptions = WidgetOptions & {
-    backgroundColor: string
+    background: string
 }
 
 // TODO: Give bevel 3d look to block
@@ -43,14 +43,14 @@ export class Block extends Widget<BlockOptions> {
         return a.value === b.value
     }
 
-    constructor(value: BlockValue, options: Partial<Omit<BlockOptions, "backgroundColor">> = {}) {
+    constructor(value: BlockValue, options: Partial<Omit<BlockOptions, "background">> = {}) {
         if (!Number.isInteger(Math.log2(value))) {
             throw new Error(`Invalid block value: ${value}`)
         }
 
         super({
             ...options,
-            backgroundColor: Block.COLOR_MAPPING[value],
+            background: Block.COLOR_MAPPING[value],
         })
 
         this._value = value
@@ -66,7 +66,7 @@ export class Block extends Widget<BlockOptions> {
 
     override draw(ctx: CanvasRenderingContext2D, layout: Layout) {
         ctx.globalAlpha = this.options.opacity
-        ctx.fillStyle = this.options.backgroundColor
+        ctx.fillStyle = this.options.background
         ctx.beginPath()
         ctx.roundRect(
             layout.left,
@@ -88,6 +88,6 @@ export class Block extends Widget<BlockOptions> {
 
     upgrade() {
         this._value = (this.value * 2) as BlockValue
-        this.baseOptions.backgroundColor = Block.COLOR_MAPPING[this._value]
+        this.baseOptions.background = Block.COLOR_MAPPING[this._value]
     }
 }

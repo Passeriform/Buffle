@@ -7,6 +7,7 @@ type BlockMoveMetadata = { targetIndex: number }
 
 type BlockMoveDeferArgs = { from: Layout, to: Layout }
 
+// TODO: Add cleanup method for removing overrides when animation is completed. Resize is breaking layout post-animation
 export class BlockMoveAnimation extends Animation<Block, BlockMoveDeferArgs> {
     public metadata: BlockMoveMetadata
 
@@ -34,7 +35,7 @@ export class BlockMergeAnimation extends BlockMoveAnimation {
 
 export class BlockUpgradeAnimation extends Animation<Block> {
     override next(delta: number) {
-        const beforeColor = parseColorHex(this.widget.options.backgroundColor)
+        const beforeColor = parseColorHex(this.widget.options.background)
         const afterColor = parseColorHex(Block.COLOR_MAPPING[this.widget.value * 2 as BlockValue])
         const [rb, gb, bb] = splitRGBChannels(beforeColor)
         const [ra, ga, ba] = splitRGBChannels(afterColor)
@@ -45,7 +46,7 @@ export class BlockUpgradeAnimation extends Animation<Block> {
         )
         const color = mergeRGBChannels(red, green, blue)
 
-        this.widget.optionsOverride.backgroundColor = toColorHex(color)
+        this.widget.optionsOverride.background = toColorHex(color)
     }
 }
 
