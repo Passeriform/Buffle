@@ -54,9 +54,10 @@ const block = new Block(BlockValue.TWO, {
 
 // Initializer
 export const init = () => {
-    blockMap.set(8, block.clone())
-    blockMap.set(12, block.clone())
-    blockMap.set(13, block.clone())
+    [8, 12, 13]
+    .forEach((index) => {
+        blockMap.set(index, block.clone())
+    })
 }
 
 // TODO: Cancel an update if previous takes too long

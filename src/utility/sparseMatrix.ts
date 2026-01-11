@@ -8,16 +8,16 @@ export class SparseMatrix<V> {
 
     private comparator(order: SortOrder) {
         return (a: number, b: number) => {
-            const ar = Math.floor(a / this.dimensions[1])
-            const ac = a % this.dimensions[1]
-            const br = Math.floor(b / this.dimensions[1])
-            const bc = b % this.dimensions[1]
+            const aRow = Math.floor(a / this.dimensions[1])
+            const aCol = a % this.dimensions[1]
+            const bRow = Math.floor(b / this.dimensions[1])
+            const bCol = b % this.dimensions[1]
 
             switch (order) {
-                case SortOrder.ROW: return ar - br || ac - bc
-                case SortOrder.ROW_REVERSE: return br - ar || ac - bc
-                case SortOrder.COLUMN: return ac - bc || ar - br
-                case SortOrder.COLUMN_REVERSE: return bc - ac || ar - br
+                case SortOrder.ROW: return aRow - bRow || aCol - bCol
+                case SortOrder.ROW_REVERSE: return aRow - bRow || bCol - aCol
+                case SortOrder.COLUMN: return aCol - bCol || aRow - bRow
+                case SortOrder.COLUMN_REVERSE: return aCol - bCol || bRow - aRow
             }
         }
     }
@@ -58,6 +58,13 @@ export class SparseMatrix<V> {
 
     get size(): Readonly<number> {
         return this.map.size
+    }
+
+    get centroid(): Readonly<[number, number]> {
+        const [rowSum, colSum] = this.indices.reduce(([rowSum, colSum], [rowIdx, colIdx]) => [rowSum + rowIdx, colSum + colIdx], [0, 0])
+        const centroid = [rowSum / this.size, colSum / this.size] as const
+
+        return centroid
     }
 
     has(key: number) {

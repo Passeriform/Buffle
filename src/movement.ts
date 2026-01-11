@@ -3,11 +3,11 @@ import { Direction } from "./controls"
 import { SortOrder, SparseMatrix } from "./utility/sparseMatrix"
 
 const sortOrderMapping = {
-    [Direction.UP]: SortOrder.ROW,
-    [Direction.DOWN]: SortOrder.ROW_REVERSE,
-    [Direction.LEFT]: SortOrder.COLUMN,
-    [Direction.RIGHT]: SortOrder.COLUMN_REVERSE,
-}
+    [Direction.UP]: SortOrder.COLUMN,
+    [Direction.DOWN]: SortOrder.COLUMN_REVERSE,
+    [Direction.LEFT]: SortOrder.ROW,
+    [Direction.RIGHT]: SortOrder.ROW_REVERSE,
+} as const
 
 type Move = [number, number]
 
