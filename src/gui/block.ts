@@ -1,4 +1,5 @@
 import { padLayout, type Layout } from "../utility/layout"
+import { Widget, type WidgetOptions } from "./widget"
 
 export enum BlockValue {
     TWO = 2,
@@ -15,80 +16,77 @@ export enum BlockValue {
     FORTY_NINETY_SIX = 4096,
 }
 
-type BlockOptions = {
-    opacity: number
-    padding: number
-    rounding: number
+type BlockOptions = WidgetOptions & {
+    backgroundColor: string
 }
 
-const COLOR_MAPPING = {
-    [BlockValue.TWO]: "#FFD6CC",
-    [BlockValue.FOUR]: "#FFB8A8",
-    [BlockValue.EIGHT]: "#FF9B84",
-    [BlockValue.SIXTEEN]: "#FF7E5E",
-    [BlockValue.THIRTY_TWO]: "#F96342",
-    [BlockValue.SIXTY_FOUR]: "#E84C2A",
-    [BlockValue.ONE_TWENTY_EIGHT]: "#CC3E22",
-    [BlockValue.TWO_FIFTY_SIX]: "#A8321F",
-    [BlockValue.FIVE_TWELVE]: "#832719",
-    [BlockValue.TEN_TWENTY_FOUR]: "#5E1D13",
-    [BlockValue.TWENTY_FORTY_EIGHT]: "#3D120B",
-    [BlockValue.FORTY_NINETY_SIX]: "#240A06",
-} satisfies Record<BlockValue, string>
+export class Block extends Widget<BlockOptions> {
+    private _value: BlockValue
 
-export class Block {
-    private layoutComputationMemo: Layout | undefined
-    public value: BlockValue
-    public options: BlockOptions
+    public static readonly COLOR_MAPPING = {
+        [BlockValue.TWO]: "#FFD6CC",
+        [BlockValue.FOUR]: "#FFB8A8",
+        [BlockValue.EIGHT]: "#FF9B84",
+        [BlockValue.SIXTEEN]: "#FF7E5E",
+        [BlockValue.THIRTY_TWO]: "#F96342",
+        [BlockValue.SIXTY_FOUR]: "#E84C2A",
+        [BlockValue.ONE_TWENTY_EIGHT]: "#CC3E22",
+        [BlockValue.TWO_FIFTY_SIX]: "#A8321F",
+        [BlockValue.FIVE_TWELVE]: "#832719",
+        [BlockValue.TEN_TWENTY_FOUR]: "#5E1D13",
+        [BlockValue.TWENTY_FORTY_EIGHT]: "#3D120B",
+        [BlockValue.FORTY_NINETY_SIX]: "#240A06",
+    } satisfies Record<BlockValue, string>
 
     static equals(a: Block, b: Block) {
         return a.value === b.value
     }
 
-    static from(block: Block, value?: number) {
-        return new Block(value ?? block.value, block.options)
-    }
-
-    private computeLayout(inLayout: Layout) {
-        this.layoutComputationMemo = inLayout
-    }
-
-    constructor(value: BlockValue, options: Partial<BlockOptions> = {}) {
+    constructor(value: BlockValue, options: Partial<Omit<BlockOptions, "backgroundColor">> = {}) {
         if (!Number.isInteger(Math.log2(value))) {
             throw new Error(`Invalid block value: ${value}`)
         }
-        this.value = value
-        this.options = {
-            padding: 0,
-            rounding: 0,
-            opacity: 1,
+
+        super({
             ...options,
-        }
+            backgroundColor: Block.COLOR_MAPPING[value],
+        })
+
+        this._value = value
     }
 
-    getSlots() {
-        return this.layoutComputationMemo ? padLayout(this.layoutComputationMemo, this.options.padding) : undefined
+    override clone(value?: number) {
+        return new Block(value ?? this._value, this.baseOptions) as this
     }
 
-    upgrade() {
-        this.value = (this.value * 2) as BlockValue
+    override getRenderLayouts(inLayout: Layout) {
+        return inLayout
     }
 
-    render(ctx: CanvasRenderingContext2D, inLayout: Layout) {
-        this.computeLayout(inLayout)
-
+    override draw(ctx: CanvasRenderingContext2D, layout: Layout) {
         ctx.globalAlpha = this.options.opacity
-        ctx.fillStyle = COLOR_MAPPING[this.value]
+        ctx.fillStyle = this.options.backgroundColor
         ctx.beginPath()
         ctx.roundRect(
-            this.layoutComputationMemo!.left,
-            this.layoutComputationMemo!.top,
-            this.layoutComputationMemo!.width,
-            this.layoutComputationMemo!.height,
+            layout.left,
+            layout.top,
+            layout.width,
+            layout.height,
             this.options.rounding,
         )
         ctx.fill()
+    }
 
-        return this.getSlots()!
+    override getSlots(layout: Layout) {
+        return padLayout(layout, this.options.padding)
+    }
+
+    get value() {
+        return this._value
+    }
+
+    upgrade() {
+        this._value = (this.value * 2) as BlockValue
+        this.baseOptions.backgroundColor = Block.COLOR_MAPPING[this._value]
     }
 }

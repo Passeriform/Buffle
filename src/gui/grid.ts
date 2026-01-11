@@ -1,25 +1,34 @@
-import type { Layout } from "../utility/layout"
+import { padLayout, type Layout } from "../utility/layout"
+import { Widget, type WidgetOptions } from "./widget"
 
-type GridOptions = {
+type GridOptions = WidgetOptions & {
     background: string
     dimensions: [number, number]
     gap: number
-    opacity: number
-    rounding: number
 }
 
-export class Grid {
-    private layoutComputationMemo: Layout[] | undefined
-    public options: GridOptions
+export class Grid extends Widget<GridOptions, never, "1**"> {
+    constructor(options: Partial<GridOptions> = {}) {
+        super({
+            background: "#5A2F28",
+            dimensions: [4, 4],
+            gap: 0,
+            ...options,
+        })
+    }
 
-    private computeLayout(inLayout: Layout) {
+    override clone() {
+        return new Grid(this.baseOptions) as this
+    }
+
+    override getRenderLayouts(inLayout: Layout) {
         const holeWidth = (inLayout.width - (this.options.dimensions[1] + 1) * this.options.gap) / this.options.dimensions[1]
         const holeHeight = (inLayout.height - (this.options.dimensions[0] + 1) * this.options.gap) / this.options.dimensions[0]
 
-        this.layoutComputationMemo = []
+        const layouts = []
         for (let row = 0; row < this.options.dimensions[0]; ++row) {
             for (let col = 0; col < this.options.dimensions[1]; ++col) {
-                this.layoutComputationMemo.push({
+                layouts.push({
                     left: inLayout.left + (col + 1) * this.options.gap + col * holeWidth,
                     top: inLayout.top + (row + 1) * this.options.gap + row * holeHeight,
                     width: holeWidth,
@@ -27,35 +36,15 @@ export class Grid {
                 })
             }
         }
+
+        return layouts
     }
 
-    constructor(options: Partial<GridOptions> = {}) {
-        this.options = {
-            background: "#5A2F28",
-            dimensions: [4, 4],
-            gap: 0,
-            opacity: 1,
-            rounding: 0,
-            ...options,
-        }
-    }
-
-    getSlots() {
-        return this.layoutComputationMemo?.map(layout => ({
-            left: layout.left,
-            top: layout.top,
-            width: layout.width,
-            height: layout.height,
-        }))
-    }
-
-    render(ctx: CanvasRenderingContext2D, inLayout: Layout) {
-        this.computeLayout(inLayout)
-
+    override draw(ctx: CanvasRenderingContext2D, layouts: Layout[]) {
         ctx.globalAlpha = this.options.opacity
         ctx.fillStyle = this.options.background
         ctx.beginPath()
-        this.layoutComputationMemo?.forEach(layout => {
+        layouts.forEach((layout) => {
             ctx.roundRect(
                 layout.left,
                 layout.top,
@@ -65,7 +54,9 @@ export class Grid {
             )
         })
         ctx.fill()
+    }
 
-        return this.getSlots()!
+    override getSlots(layouts: Layout[]) {
+        return layouts.map((layout) => padLayout(layout, this.options.padding))
     }
 }

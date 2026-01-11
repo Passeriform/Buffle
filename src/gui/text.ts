@@ -1,27 +1,38 @@
 import type { Layout } from "../utility/layout"
+import { Widget, type WidgetOptions } from "./widget"
 
-type TextOptions = {
-    margin: number
+type TextOptions = WidgetOptions & {
     color: string
     font: string
     align: CanvasTextAlign
     baseline: CanvasTextBaseline
-    opacity: number
 }
 
-export class Text {
-    private content: string
-    private layoutComputationMemo: Layout | undefined
-    public options: TextOptions
+type TextWidgetState = string
 
-    private computeLayout(inLayout: Layout) {
+export class Text extends Widget<TextOptions, TextWidgetState> {
+    constructor(options: Partial<TextOptions> = {}) {
+        super({
+            color: "#F3EDEB",
+            font: "Quicksand",
+            align: "center",
+            baseline: "middle",
+            ...options,
+        })
+    }
+
+    override clone() {
+        return new Text(this.baseOptions) as this
+    }
+
+    override getRenderLayouts(inLayout: Layout) {
         const base = Math.min(inLayout.width, inLayout.height) - this.options.margin
         const [xCenter, yCenter] = [
             inLayout.left + (inLayout.width / 2),
             inLayout.top + (inLayout.height / 2),
         ]
 
-        this.layoutComputationMemo = {
+        return {
             left: xCenter - (base / 2),
             top: yCenter - (base / 2),
             width: base,
@@ -29,37 +40,20 @@ export class Text {
         }
     }
 
-    constructor(options: Partial<TextOptions> = {}) {
-        this.content = "Set content via withContent in render"
-        this.options = {
-            color: "#F3EDEB",
-            font: "Quicksand",
-            align: "center",
-            baseline: "middle",
-            margin: 0,
-            opacity: 1,
-            ...options,
-        }
-    }
-
-    withContent(content: string) {
-        this.content = content
-
-        return this
-    }
-
-    render(ctx: CanvasRenderingContext2D, inLayout: Layout) {
-        this.computeLayout(inLayout)
-
+    override draw(ctx: CanvasRenderingContext2D, layout: Layout, state: TextWidgetState) {
         ctx.globalAlpha = this.options.opacity
-        ctx.font = `bold ${this.layoutComputationMemo!.height}px ${this.options.font}`
+        ctx.font = `bold ${layout.height}px ${this.options.font}`
         ctx.textAlign = this.options.align
         ctx.textBaseline = this.options.baseline
         ctx.fillStyle = this.options.color
         ctx.fillText(
-            this.content,
-            this.layoutComputationMemo!.left + (this.layoutComputationMemo!.width / 2),
-            this.layoutComputationMemo!.top + (this.layoutComputationMemo!.height / 2),
+            state,
+            layout.left + (layout.width / 2),
+            layout.top + (layout.height / 2),
         )
+    }
+
+    override getSlots(layout: Layout) {
+        return layout
     }
 }

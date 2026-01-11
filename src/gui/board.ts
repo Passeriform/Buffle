@@ -1,20 +1,27 @@
 import { padLayout, type Layout } from "../utility/layout"
+import { Widget, type WidgetOptions } from "./widget"
 
-type BoardOptions = {
+type BoardOptions = WidgetOptions & {
     background: string
-    margin: number
     max: number
     min: number
-    opacity: number
-    padding: number
-    rounding: number
 }
 
-export class Board {
-    private layoutComputationMemo: Layout | undefined
-    public options: BoardOptions
+export class Board extends Widget<BoardOptions> {
+    constructor(options: Partial<BoardOptions> = {}) {
+        super({
+            background: "#6B3C33",
+            max: 1600,
+            min: 400,
+            ...options,
+        })
+    }
 
-    private computeLayout(inLayout: Layout) {
+    override clone() {
+        return new Board(this.baseOptions) as this
+    }
+
+    override getRenderLayouts(inLayout: Layout) {
         const base = Math.min(inLayout.width, inLayout.height) - this.options.margin
         const minClamped = this.options.min ? Math.max(this.options.min, base) : base
         const maxClamped = this.options.max ? Math.min(this.options.max, minClamped) : minClamped
@@ -23,7 +30,7 @@ export class Board {
             inLayout.top + (inLayout.height / 2),
         ]
 
-        this.layoutComputationMemo = {
+        return {
             left: xCenter - (maxClamped / 2),
             top: yCenter - (maxClamped / 2),
             width: maxClamped,
@@ -31,38 +38,21 @@ export class Board {
         }
     }
 
-    constructor(options: Partial<BoardOptions> = {}) {
-        this.options = {
-            background: "#6B3C33",
-            margin: 0,
-            max: 1600,
-            min: 400,
-            opacity: 1,
-            padding: 0,
-            rounding: 0,
-            ...options,
-        }
-    }
-
-    getSlots() {
-        return this.layoutComputationMemo ? padLayout(this.layoutComputationMemo, this.options.padding) : undefined
-    }
-
-    render(ctx: CanvasRenderingContext2D, inLayout: Layout) {
-        this.computeLayout(inLayout)
-
+    override draw(ctx: CanvasRenderingContext2D, layout: Layout) {
         ctx.globalAlpha = this.options.opacity
         ctx.fillStyle = this.options.background
         ctx.beginPath()
         ctx.roundRect(
-            this.layoutComputationMemo!.left,
-            this.layoutComputationMemo!.top,
-            this.layoutComputationMemo!.width,
-            this.layoutComputationMemo!.height,
+            layout.left,
+            layout.top,
+            layout.width,
+            layout.height,
             this.options.rounding,
         )
         ctx.fill()
+    }
 
-        return this.getSlots()!
+    override getSlots(layout: Layout) {
+        return padLayout(layout, this.options.padding)
     }
 }
