@@ -67,3 +67,12 @@ export const bindControls = (root: HTMLElement, handler: (action: Direction) => 
     bindKeyboard(root, handler, processQueue)
     bindPointer(root, handler, processQueue)
 }
+
+// TODO: Expose different set of bindings for controls with schema
+export const bindReset = (root: HTMLElement, reset: () => void) => {
+    root.addEventListener("keydown", (e) => {
+        if (["r", "R"].includes(e.key)) {
+            reset()
+        }
+    })
+}

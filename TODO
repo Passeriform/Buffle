@@ -8,3 +8,11 @@ Recommendations:
 Naming:
     ☐ Blocks can be pattern/glyph based to avoid 2 -> 4 confusion when merging 3 of the same
     ☐ Blocks can be numbered 2, 6, 18, ... but that will be more confusing
+
+Game over screen:
+    ☐ Pause bindings for Game
+    ☐ Define bindings as swappable
+    ☐ Add reset method
+        ☐ Clear animation manager
+        ☐ Pause primary update loop
+        ☐ Bind game over controls loop

@@ -44,23 +44,51 @@ export const splitVertical = (layout: Layout, ...heights: number[]) => {
     return layouts
 }
 
+export const splitHorizontal = (layout: Layout, ...widths: number[]) => {
+    const layouts = [] as Layout[]
+
+    let consumed = 0
+    const remaining = layout.width
+
+    for (const width of widths) {
+        if (remaining < width) {
+            throw Error("Layout is not big enough for splitting.")
+        }
+
+        layouts.push({ ...layout, left: layout.left + consumed, width })
+
+        consumed += width
+    }
+
+    if (consumed < layout.width) {
+        layouts.push({ ...layout, left: layout.left + consumed, width: layout.width - consumed })
+    }
+
+    return layouts
+}
+
 export const wireframe = (ctx: CanvasRenderingContext2D, layout: Layout) => {
     const styleBackup = [ctx.fillStyle, ctx.strokeStyle] as const
+
     ctx.fillStyle = "#DD4DAD20"
     ctx.strokeStyle = "#DD4DADA0"
+
     ctx.fillRect(layout.left, layout.top, layout.width, layout.height)
     ctx.strokeRect(layout.left, layout.top, layout.width, layout.height)
+
     const [topLeft, topRight, bottomLeft, bottomRight] = [
         [layout.left, layout.top],
         [layout.left + layout.width, layout.top],
         [layout.left, layout.top + layout.height],
         [layout.left + layout.width, layout.top + layout.height],
     ] as const
+
     ctx.moveTo(...topLeft)
     ctx.lineTo(...bottomRight)
     ctx.moveTo(...topRight)
     ctx.lineTo(...bottomLeft)
     ctx.stroke()
+
     ctx.fillStyle = styleBackup[0]
     ctx.strokeStyle = styleBackup[0]
 }

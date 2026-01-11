@@ -8,10 +8,9 @@ import { Text } from "./gui/text"
 import { computeMatches } from "./matcher/matcher"
 import { computeMoves } from "./movement"
 import { computeNextBlockValue } from "./utility/difficulty"
-import { padLayout, rootLayout, splitVertical } from "./utility/layout"
+import { padLayout, rootLayout, splitHorizontal, splitVertical } from "./utility/layout"
 import { SparseMatrix } from "./utility/sparseMatrix"
 import type { DirectionalMatch } from "./matcher/directionalMatcher"
-import { parse } from "../tests/utility"
 
 // Config
 const gameSpeed = 1
@@ -24,6 +23,7 @@ const spawnTween = new Tween(200 / gameSpeed, Easing.EASE_IN_OUT)
 // Game state
 let totalMoves = 0
 let totalScore = 0
+let gameOver = false
 const blockMap = new SparseMatrix<Block>([], gridDimensions)
 const animationManager: AnimationManager = new AnimationManager()
 
@@ -49,6 +49,21 @@ const block = new Block(BlockValue.TWO, {
 const blockValueText = new Text({
     margin: 20,
     color: "#6A4537",
+})
+const menu = new ResponsiveContainer({
+    background: "#1F1412",
+    margin: 50,
+    padding: 20,
+    rounding: 20,
+})
+const gameOverTitleText = new Text({
+    margin: 100,
+})
+const gameOverStatsText = new Text({
+    margin: 20,
+})
+const restartText = new Text({
+    margin: 100,
 })
 
 // TODO: Implement web-worker event handler
@@ -144,6 +159,7 @@ export const init = () => {
 }
 
 // TODO: Cancel an update if previous takes too long
+// TODO: Add context based input handling
 
 // Update handler
 export const update = async (direction: Direction) => {
@@ -165,6 +181,13 @@ export const update = async (direction: Direction) => {
     totalMoves++
 
     await spawn()
+
+    // TODO: Check another round for merges after spawning a new block
+
+    // Check for game over
+    if (blockMap.size === blockMap.maxSize) {
+        gameOver = true
+    }
 }
 
 // Draw loop
@@ -205,6 +228,34 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
         blockValueText.render(ctx, valueSlot, `${BlockValue.repr(block.value)}`)
     })
 
+    if (gameOver) {
+        const contentSlot = menu.render(ctx, root)
+        // TODO: Add leaderboard widget
+        const [titleSlot, statsSlot, restartSlot, _] = splitVertical(contentSlot, 250, 100, 150)
+        const [scoreSlot, movesSlot] = splitHorizontal(statsSlot, statsSlot.width / 2, statsSlot.width / 2)
+
+        gameOverTitleText.render(ctx, titleSlot, "GAME OVER")
+
+        gameOverStatsText.render(ctx, scoreSlot, `Score: ${totalScore}`)
+        gameOverStatsText.render(ctx, movesSlot, `Moves: ${totalMoves}`)
+
+        restartText.render(ctx, restartSlot, `Press (r) to restart`)
+    }
+
     // Recurse calls
     requestAnimationFrame((delta) => draw(delta, ctx))
+}
+
+export const reset = () => {
+    if (!gameOver) {
+        return
+    }
+
+    totalMoves = 0
+    totalScore = 0
+    gameOver = false
+
+    blockMap.clear()
+
+    init()
 }
