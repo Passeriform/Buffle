@@ -1,4 +1,3 @@
-import type { AnyAnimation } from "./animation"
 import { Direction } from "./controls"
 import { SortOrder, SparseMatrix } from "./utility/sparseMatrix"
 
@@ -69,23 +68,5 @@ export const computeMoves = <T extends object>(state: SparseMatrix<T>, direction
         }
     }, sortOrderMapping[direction])
 
-    // TODO: Move out to game.ts
-    // FIXME: Sometimes unfilled 0th index is reported no moves. Possible bug in move computation
-    const commit = async (animationFactory: {
-        move: (from: number, to: number) => AnyAnimation,
-    }) => {
-        if (!moves.length) {
-            return 0
-        }
-
-        const animations = moves.map(([current, targetIndex]) => animationFactory.move(current, targetIndex))
-        await Promise.allSettled(animations.map((animation) => animation.completed))
-        moves.forEach(([before, after]) => {
-            state.updateKey(before, after)
-        })
-
-        return moves.length
-    }
-
-    return { moves, commit }
+    return { moves }
 }

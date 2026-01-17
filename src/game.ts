@@ -1,4 +1,4 @@
-import { AnimationManager, Easing, Tween } from "./animation"
+import { Animation, AnimationManager, Easing, Tween } from "./animation"
 import { BlockMergeAnimation, BlockMoveAnimation, BlockSpawnAnimation, BlockUpgradeAnimation } from "./animationList"
 import { Direction } from "./controls"
 import { Block, BlockValue } from "./gui/block"
@@ -54,13 +54,66 @@ const block = new Block(BlockValue.TWO, {
 // TODO: Implement web-worker event handler
 // TODO: Add game over screen
 
+// Movement
+const move = async (direction: Direction) => {
+    // FIXME: Sometimes unfilled 0th index is reported no moves. Possible bug in move computation
+    const { moves } = computeMoves(blockMap, direction)
+
+    if (!moves.length) {
+        return moves.length
+    }
+
+    const animations = moves.map(([current, targetIndex]) => new BlockMoveAnimation(blockMap.get(current)!, moveTween, { targetIndex }))
+
+    animations.forEach((animation) => animationManager.add(animation))
+
+    await Animation.waitCompletion(...animations)
+
+    moves.forEach(([before, after]) => {
+        blockMap.updateKey(before, after)
+    })
+
+    return moves.length
+}
+
+// Merge
+const merge = async (direction: Direction) => {
+    const { primary, secondary } = computeMatches(blockMap, direction, (a, b) => a.value === b.value, 3)
+
+    const matches = [...primary, ...secondary]
+
+    if (!matches.length) {
+        return matches.length
+    }
+
+    const animations = matches.flatMap(({ indices }) => [
+        new BlockUpgradeAnimation(blockMap.get(indices[0])!, upgradeTween),
+        ...indices.slice(1).map((index) => new BlockMergeAnimation(blockMap.get(index)!, mergeTween, { targetIndex: indices[0] })),
+    ])
+
+    animations.forEach((animation) => animationManager.add(animation))
+
+    await Animation.waitCompletion(...animations)
+
+    matches.forEach(({ indices }) => {
+        const block = blockMap.get(indices[0])!
+        totalScore += block.value * indices.length
+        block.upgrade()
+        indices.slice(1).forEach((index) => {
+            blockMap.delete(index)
+        })
+    })
+
+    return matches.reduce((blockCount, { indices }) => blockCount + indices.length, 0)
+}
+
 // Initializer
 export const init = () => {
     // TODO: Add spawn animation for init
     [8, 12, 13]
-    .forEach((index) => {
-        blockMap.set(index, block.clone())
-    })
+        .forEach((index) => {
+            blockMap.set(index, block.clone())
+        })
 }
 
 // TODO: Cancel an update if previous takes too long
@@ -71,49 +124,10 @@ export const update = async (direction: Direction) => {
     let loopPerformed = false
 
     do {
-        loopPerformed = false
+        const movedBlocks = await move(direction)
+        const mergedBlocks = await merge(direction)
 
-        // Move blocks
-        const { commit: move } = computeMoves(blockMap, direction)
-
-        const movedBlocks = await move({
-            move: (from, to) => {
-                const block = blockMap.get(from)!
-                const animation = new BlockMoveAnimation(block, moveTween, { targetIndex: to })
-                animationManager.add(animation)
-                return animation
-            }
-        })
-
-        loopPerformed ||= Boolean(movedBlocks)
-
-        // Merge blocks
-        const { matches, commit: match } = computeMatches(blockMap, direction, {
-            equalFn: Block.equals,
-            upgradeFn: (block) => block.upgrade(),
-        })
-
-        const mergedBlocks = await match({
-            merge: (index, to) => {
-                const block = blockMap.get(index)!
-                const animation = new BlockMergeAnimation(block, mergeTween, { targetIndex: to })
-                animationManager.add(animation)
-                return animation
-            },
-            upgrade: (index) => {
-                const block = blockMap.get(index)!
-                const animation = new BlockUpgradeAnimation(block, upgradeTween)
-                animationManager.add(animation)
-                return animation
-            }
-        })
-
-        matches.forEach((m) => {
-            const block = blockMap.get(m.indices[0])!
-            totalScore += block.value * m.indices.length
-        })
-
-        loopPerformed ||= Boolean(mergedBlocks)
+        loopPerformed = Boolean(movedBlocks) || Boolean(mergedBlocks)
         updatePerformed ||= loopPerformed
     } while (loopPerformed)
 

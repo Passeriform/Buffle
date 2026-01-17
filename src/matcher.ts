@@ -1,4 +1,3 @@
-import { Animation, type AnyAnimation } from "./animation"
 import { Direction } from "./controls"
 import { SortOrder, type SparseMatrix } from "./utility/sparseMatrix"
 
@@ -62,7 +61,7 @@ const getDirectionalMatches = <T>(
 
 // FIXME: Fix double matching on primary and secondary overlaps
 // FIXME: Fix wrapped blocks matching in previous row and column
-const detectMatches = <T>(
+export const computeMatches = <T>(
     state: SparseMatrix<T>,
     direction: Direction,
     equalFn: (a: T, b: T) => boolean,
@@ -86,46 +85,4 @@ const detectMatches = <T>(
     const secondary = getDirectionalMatches(state, secondaryDirection, equalFn).filter(({ indices }) => indices.length >= threshold)
 
     return { primary, secondary }
-}
-
-export const computeMatches = <T extends object>(
-    state: SparseMatrix<T>,
-    direction: Direction,
-    options: {
-        // TODO: Remove callbacks after moving commit to game.ts
-        equalFn: (a: T, b: T) => boolean,
-        upgradeFn: (a: T) => void,
-    },
-) => {
-    const { primary, secondary } = detectMatches(state, direction, options.equalFn, 3)
-
-    // TODO: Move out to game.ts
-    const commit = async (animationFactory: {
-        merge: (index: number, to: number) => AnyAnimation,
-        upgrade: (index: number) => AnyAnimation,
-    }) => {
-        if (!primary.length && !secondary.length) {
-            return 0
-        }
-
-        // TODO: Extract creation of Tween outside and only await in here
-        const mergeAnimations = [...primary, ...secondary].flatMap(({ indices }) => indices.slice(1).map((index) => animationFactory.merge(index, indices[0])))
-        const upgradeAnimations = [...primary, ...secondary].map(({ indices }) => animationFactory.upgrade(indices[0]))
-
-        await Animation.waitCompletion(...mergeAnimations, ...upgradeAnimations)
-
-        ;[...primary, ...secondary].forEach(({ indices }) => {
-            indices.slice(1).forEach((index) => {
-                state.delete(index)
-            })
-        })
-
-        ;[...primary, ...secondary].forEach(({ indices }) => {
-            options.upgradeFn(state.get(indices[0])!)
-        })
-
-        return [...primary, ...secondary].length
-    }
-
-    return { matches: [...primary, ...secondary], commit }
 }
