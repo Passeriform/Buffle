@@ -82,7 +82,7 @@ const move = async (direction: Direction) => {
 
 // Merge
 const merge = async (direction: Direction) => {
-    const { primary, secondary } = computeMatches(blockMap, direction, (a, b) => a.value === b.value, 3)
+    const { primary, secondary } = computeMatches(blockMap, direction, Block.equals, 3)
 
     const matches = [...primary, ...secondary]
 
@@ -128,7 +128,7 @@ const spawn = async () => {
 // Initializer
 export const init = () => {
     // TODO: Add spawn animation for init
-    [0, 2, 3, 8]
+    [0, 1, 4]
         .forEach((index) => {
             blockMap.set(index, block.clone())
         })
@@ -193,7 +193,7 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
         }
 
         const valueSlot = block.render(ctx, blockSlots[index])
-        blockValueText.render(ctx, valueSlot, `${2 ** (block.value + 1)}`)
+        blockValueText.render(ctx, valueSlot, `${block.value}`)
     })
 
     // Recurse calls

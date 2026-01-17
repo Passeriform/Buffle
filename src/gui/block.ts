@@ -44,7 +44,7 @@ export class Block extends Widget<BlockOptions & { background: string }> {
     } satisfies Record<BlockValue, string>
 
     static equals(a: Block, b: Block) {
-        return a.value === b.value
+        return a._value === b._value
     }
 
     constructor(value: BlockValue, options: Partial<BlockOptions> = {}) {
@@ -84,8 +84,12 @@ export class Block extends Widget<BlockOptions & { background: string }> {
         return padLayout(layout, this.options.padding)
     }
 
-    get value(): Readonly<BlockValue> {
+    get index(): Readonly<BlockValue> {
         return this._value
+    }
+
+    get value(): Readonly<BlockValue> {
+        return 2 ** (this._value + 1)
     }
 
     upgrade() {
