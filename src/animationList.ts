@@ -35,7 +35,7 @@ export class BlockMergeAnimation extends BlockMoveAnimation {
 
 export class BlockUpgradeAnimation extends Animation<Block> {
     override next(delta: number) {
-        const beforeColor = parseColorHex(this.widget.options.background)
+        const beforeColor = parseColorHex(Block.COLOR_MAPPING[this.widget.value])
         const afterColor = parseColorHex(Block.COLOR_MAPPING[BlockValue.next(this.widget.value)])
         const [rb, gb, bb] = splitRGBChannels(beforeColor)
         const [ra, ga, ba] = splitRGBChannels(afterColor)

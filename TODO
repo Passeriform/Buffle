@@ -1,4 +1,10 @@
+☐ Add configuration handler for palette, sizing, game speed, pattern stencil swap
+
 Recommendations:
-    ☐ Add animations for move, merge and spawn
     ☐ Raised blocks for visual clarity
     ☐ Add powers for >3 matches and match patterns
+    ☐ Add how to play screen
+
+Naming:
+    ☐ Blocks can be pattern/glyph based to avoid 2 -> 4 confusion when merging 3 of the same
+    ☐ Blocks can be numbered 2, 6, 18, ... but that will be more confusing
