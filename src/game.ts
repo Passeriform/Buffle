@@ -111,6 +111,20 @@ const merge = async (direction: Direction) => {
     return matches.reduce((blockCount, { indices }) => blockCount + indices.length, 0)
 }
 
+const spawn = async () => {
+    const spawnIndex = blockMap.randomUnusedIndex()
+    const spawnValue = computeNextBlockValue(blockMap)
+
+    const spawnBlock = block.clone(spawnValue)
+    blockMap.set(spawnIndex, spawnBlock)
+
+    const animation = new BlockSpawnAnimation(spawnBlock, spawnTween)
+
+    animationManager.add(animation)
+
+    await Animation.waitCompletion(animation)
+}
+
 // Initializer
 export const init = () => {
     // TODO: Add spawn animation for init
@@ -141,12 +155,7 @@ export const update = async (direction: Direction) => {
 
     totalMoves++
 
-    // Spawn new block
-    const spawnBlock = block.clone(computeNextBlockValue(blockMap))
-    blockMap.set(blockMap.randomUnusedIndex(), spawnBlock)
-    const animation = new BlockSpawnAnimation(spawnBlock, spawnTween)
-    animationManager.add(animation)
-    await animation.completed
+    await spawn()
 }
 
 // Draw loop
