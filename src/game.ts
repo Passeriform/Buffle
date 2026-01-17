@@ -50,6 +50,10 @@ const block = new Block(BlockValue.TWO, {
     padding: 20,
     rounding: 20,
 })
+const blockValueText = new Text({
+    margin: 20,
+    color: "#6A4537",
+})
 
 // TODO: Implement web-worker event handler
 // TODO: Add game over screen
@@ -110,7 +114,7 @@ const merge = async (direction: Direction) => {
 // Initializer
 export const init = () => {
     // TODO: Add spawn animation for init
-    [8, 12, 13]
+    [0, 2, 3, 8]
         .forEach((index) => {
             blockMap.set(index, block.clone())
         })
@@ -179,7 +183,8 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
             })
         }
 
-        block.render(ctx, blockSlots[index])
+        const valueSlot = block.render(ctx, blockSlots[index])
+        blockValueText.render(ctx, valueSlot, `${2 ** (block.value + 1)}`)
     })
 
     // Recurse calls

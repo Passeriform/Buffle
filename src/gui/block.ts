@@ -2,18 +2,24 @@ import { padLayout, type Layout } from "../utility/layout"
 import { Widget, type WidgetOptions } from "./widget"
 
 export enum BlockValue {
-    TWO = 2,
-    FOUR = 4,
-    EIGHT = 8,
-    SIXTEEN = 16,
-    THIRTY_TWO = 32,
-    SIXTY_FOUR = 64,
-    ONE_TWENTY_EIGHT = 128,
-    TWO_FIFTY_SIX = 256,
-    FIVE_TWELVE = 512,
-    TEN_TWENTY_FOUR = 1024,
-    TWENTY_FORTY_EIGHT = 2048,
-    FORTY_NINETY_SIX = 4096,
+    TWO,
+    FOUR,
+    EIGHT,
+    SIXTEEN,
+    THIRTY_TWO,
+    SIXTY_FOUR,
+    ONE_TWENTY_EIGHT,
+    TWO_FIFTY_SIX,
+    FIVE_TWELVE,
+    TEN_TWENTY_FOUR,
+    TWENTY_FORTY_EIGHT,
+    FORTY_NINETY_SIX,
+}
+
+export namespace BlockValue {
+    export const next = (value: BlockValue): BlockValue => {
+        return value + 1 as BlockValue;
+    }
 }
 
 type BlockOptions = WidgetOptions
@@ -42,7 +48,7 @@ export class Block extends Widget<BlockOptions & { background: string }> {
     }
 
     constructor(value: BlockValue, options: Partial<BlockOptions> = {}) {
-        if (!Number.isInteger(Math.log2(value))) {
+        if (value < 0 || value > BlockValue.FORTY_NINETY_SIX) {
             throw new Error(`Invalid block value: ${value}`)
         }
 
@@ -83,6 +89,6 @@ export class Block extends Widget<BlockOptions & { background: string }> {
     }
 
     upgrade() {
-        this._value = (this.value * 2) as BlockValue
+        this._value = BlockValue.next(this._value)
     }
 }
