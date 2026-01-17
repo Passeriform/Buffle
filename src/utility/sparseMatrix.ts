@@ -4,14 +4,14 @@ export class SparseMatrix<V> {
     private map = new Map<number, V>()
     private dirty = false
     private keys: number[] = []
-    public readonly dimensions: [number, number]
+    public readonly shape: [number, number]
 
     private comparator(order: SortOrder) {
         return (a: number, b: number) => {
-            const aRow = Math.floor(a / this.dimensions[1])
-            const aCol = a % this.dimensions[1]
-            const bRow = Math.floor(b / this.dimensions[1])
-            const bCol = b % this.dimensions[1]
+            const aRow = Math.floor(a / this.shape[1])
+            const aCol = a % this.shape[1]
+            const bRow = Math.floor(b / this.shape[1])
+            const bCol = b % this.shape[1]
 
             switch (order) {
                 case SortOrder.ROW: return aRow - bRow || aCol - bCol
@@ -41,19 +41,19 @@ export class SparseMatrix<V> {
         return entries[Symbol.iterator]()
     }
 
-    constructor(iterable: Iterable<readonly [number, V]>, dimensions: [number, number]) {
+    constructor(iterable: Iterable<readonly [number, V]>, shape: [number, number]) {
         this.map = new Map(iterable)
         this.keys = [...this.map.keys()]
-        this.dimensions = dimensions
+        this.shape = shape
         this.dirty = true
     }
 
     get indices(): ReadonlyArray<[number, number]> {
-        return [...this.keys].sort().map((fk) => [Math.floor(fk / this.dimensions[1]), fk % this.dimensions[1]] as const)
+        return [...this.keys].sort().map((fk) => [Math.floor(fk / this.shape[1]), fk % this.shape[1]] as const)
     }
 
     get maxSize(): Readonly<number> {
-        return this.dimensions[0] * this.dimensions[1]
+        return this.shape[0] * this.shape[1]
     }
 
     get size(): Readonly<number> {

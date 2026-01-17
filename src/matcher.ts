@@ -22,8 +22,8 @@ const getDirectionalMatches = <T>(
     equalFn: (a: T, b: T) => boolean,
 ) => {
     const strideMapping = {
-        [Direction.UP]: state.dimensions[1],
-        [Direction.DOWN]: -state.dimensions[1],
+        [Direction.UP]: state.shape[1],
+        [Direction.DOWN]: -state.shape[1],
         [Direction.LEFT]: 1,
         [Direction.RIGHT]: -1,
     }
@@ -71,8 +71,8 @@ export const computeMatches = <T>(
 
     const [rowCentroidIdx, colCentroidIdx] = state.centroid
     const [downBias, rightBias] = [
-        rowCentroidIdx > (state.dimensions[0] - 1) / 2,
-        colCentroidIdx > (state.dimensions[1] - 1) / 2,
+        rowCentroidIdx > (state.shape[0] - 1) / 2,
+        colCentroidIdx > (state.shape[1] - 1) / 2,
     ]
 
     const secondaryDirection = {

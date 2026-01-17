@@ -15,8 +15,8 @@ const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Directi
     switch (direction) {
         case Direction.UP: {
             let track = index
-            while (track - state.dimensions[1] >= 0 && !state.has(track - state.dimensions[1])) {
-                track -= state.dimensions[1]
+            while (track - state.shape[1] >= 0 && !state.has(track - state.shape[1])) {
+                track -= state.shape[1]
             }
             if (track !== index) {
                 state.updateKey(index, track)
@@ -25,8 +25,8 @@ const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Directi
         }
         case Direction.DOWN: {
             let track = index
-            while (track + state.dimensions[1] < state.dimensions[1] * state.dimensions[1] && !state.has(track + state.dimensions[1])) {
-                track += state.dimensions[1]
+            while (track + state.shape[1] < state.shape[1] * state.shape[1] && !state.has(track + state.shape[1])) {
+                track += state.shape[1]
             }
             if (track !== index) {
                 state.updateKey(index, track)
@@ -35,7 +35,7 @@ const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Directi
         }
         case Direction.LEFT: {
             let track = index
-            while (track % state.dimensions[1] !== 0 && !state.has(track - 1)) {
+            while (track % state.shape[1] !== 0 && !state.has(track - 1)) {
                 --track
             }
             if (track !== index) {
@@ -45,7 +45,7 @@ const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Directi
         }
         case Direction.RIGHT: {
             let track = index
-            while ((track + 1) % state.dimensions[1] !== 0 && !state.has(track + 1)) {
+            while ((track + 1) % state.shape[1] !== 0 && !state.has(track + 1)) {
                 ++track
             }
             if (track !== index) {
@@ -57,7 +57,7 @@ const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Directi
 }
 
 export const computeMoves = <T extends object>(state: SparseMatrix<T>, direction: Direction) => {
-    const copyState = new SparseMatrix<T>(state, state.dimensions)
+    const copyState = new SparseMatrix<T>(state, state.shape)
 
     const moves: Move[] = []
 
