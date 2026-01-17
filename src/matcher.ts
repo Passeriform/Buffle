@@ -28,32 +28,54 @@ const getDirectionalMatches = <T>(
         [Direction.RIGHT]: -1,
     }
 
-    const matches = state.reduce<Match[]>((acc, value, index) => {
-        const last = acc.at(-1)
+    const isWrapped = (last: number, current: number) => {
+        switch (direction) {
+            case Direction.LEFT:
+            case Direction.RIGHT:
+                return Math.floor(last / state.shape[1]) !== Math.floor(current / state.shape[1])
+            case Direction.UP:
+            case Direction.DOWN:
+                return (last % state.shape[1]) !== (current % state.shape[1])
+        }
+    }
+
+    const isContiguous = (collection: Match[], value: T, index: number) => {
+        const last = collection.at(-1)
 
         if (!last) {
-            return [...acc, { direction, indices: [index] }]
+            return false
         }
 
         const lastIndex = last.indices.at(-1)
 
         if (lastIndex === undefined) {
-            return [...acc, { direction, indices: [index] }]
+            return false
+        }
+
+        if (isWrapped(index, lastIndex)) {
+            return false
         }
 
         const expectedNextIndex = lastIndex + strideMapping[direction]
 
         if (index !== expectedNextIndex) {
-            return [...acc, { direction, indices: [index] }]
+            return false
         }
 
         if (!equalFn(value, state.get(lastIndex)!)) {
-            return [...acc, { direction, indices: [index] }]
+            return false
         }
 
-        acc[acc.length - 1].indices.push(index)
+        return true
+    }
 
-        return acc
+    const matches = state.reduce<Match[]>((acc, value, index) => {
+        if (isContiguous(acc, value, index)) {
+            acc[acc.length - 1].indices.push(index)
+            return acc
+        } else {
+            return [...acc, { direction, indices: [index] }]
+        }
     }, [], orderMapping[direction])
 
     return matches
