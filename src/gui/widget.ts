@@ -40,6 +40,13 @@ export abstract class Widget<
     // TODO: Use proxy object on options for fine-grained mutation
     public optionsOverride: Partial<Options> = {}
 
+    protected makeDynamicOption(key: keyof Options, valueGetter: () => unknown) {
+        Object.defineProperty(this.baseOptions, key, {
+            enumerable: true,
+            get: valueGetter,
+        })
+    }
+
     constructor(options: Partial<Options> = {}) {
         this.baseOptions = {
             margin: 0,

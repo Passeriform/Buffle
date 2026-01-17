@@ -16,12 +16,10 @@ export enum BlockValue {
     FORTY_NINETY_SIX = 4096,
 }
 
-type BlockOptions = WidgetOptions & {
-    background: string
-}
+type BlockOptions = WidgetOptions
 
 // TODO: Give bevel 3d look to block
-export class Block extends Widget<BlockOptions> {
+export class Block extends Widget<BlockOptions & { background: string }> {
     private _value: BlockValue
 
     public static readonly COLOR_MAPPING = {
@@ -43,17 +41,15 @@ export class Block extends Widget<BlockOptions> {
         return a.value === b.value
     }
 
-    constructor(value: BlockValue, options: Partial<Omit<BlockOptions, "background">> = {}) {
+    constructor(value: BlockValue, options: Partial<BlockOptions> = {}) {
         if (!Number.isInteger(Math.log2(value))) {
             throw new Error(`Invalid block value: ${value}`)
         }
 
-        super({
-            ...options,
-            background: Block.COLOR_MAPPING[value],
-        })
+        super(options)
 
         this._value = value
+        this.makeDynamicOption("background", () => Block.COLOR_MAPPING[this._value])
     }
 
     override clone(value?: number) {
@@ -88,6 +84,5 @@ export class Block extends Widget<BlockOptions> {
 
     upgrade() {
         this._value = (this.value * 2) as BlockValue
-        this.baseOptions.background = Block.COLOR_MAPPING[this._value]
     }
 }
