@@ -71,7 +71,9 @@ export abstract class Widget<
 
     render(ctx: CanvasRenderingContext2D, inLayout: InLayout<Chaining>, ...state: ([State] extends [never] ? [undefined?] : [State])) {
         const renderLayouts = this.getRenderLayouts(this.layoutOverride ?? inLayout)
+        ctx.save()
         this.draw(ctx, renderLayouts, ...state)
+        ctx.restore()
         const slots = this.getSlots(renderLayouts)!
 
         return slots

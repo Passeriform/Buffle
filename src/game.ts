@@ -111,6 +111,7 @@ const merge = async (direction: Direction) => {
     return matches.reduce((blockCount, { indices }) => blockCount + indices.length, 0)
 }
 
+// Spawn
 const spawn = async () => {
     const spawnIndex = blockMap.randomUnusedIndex()
     const spawnValue = computeNextBlockValue(blockMap)
@@ -128,7 +129,7 @@ const spawn = async () => {
 // Initializer
 export const init = () => {
     // TODO: Add spawn animation for init
-    [0, 1, 4]
+    [8, 12, 13]
         .forEach((index) => {
             blockMap.set(index, block.clone())
         })
@@ -165,7 +166,7 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
 
     // Render
     const root = padLayout(rootLayout(ctx.canvas), 50)
-    const [scoreSlot, boardSlot] = splitVertical(root, 120)
+    const [scoreSlot, boardSlot] = splitVertical(root, root.height / 8)
     scoreText.render(ctx, scoreSlot, `Score: ${totalScore}`)
     const gridSlot = board.render(ctx, boardSlot)
     const blockSlots = grid.render(ctx, gridSlot)
