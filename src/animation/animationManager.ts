@@ -9,7 +9,7 @@ export class AnimationManager<W extends AnyWidget = AnyWidget, A extends Animati
     }
 
     has(item: W) {
-        return this.animations.has(item) && this.animations.get(item)!.some((animation) => !animation.isCompleted)
+        return this.animations.has(item) && this.animations.get(item)!.some((animation) => !animation.completed.value)
     }
 
     add(animation: A) {
@@ -19,6 +19,6 @@ export class AnimationManager<W extends AnyWidget = AnyWidget, A extends Animati
     }
 
     get(item: W) {
-        return this.animations.get(item)?.filter((animation) => !animation.isCompleted)
+        return this.animations.get(item)?.filter((animation) => !animation.completed.value)
     }
 }

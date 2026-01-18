@@ -1,5 +1,6 @@
 import type { AnyWidget } from "../gui/widget"
 import { Easing, type EasingMethod } from "./easing"
+import { Signal } from "./signal"
 import type { Tween } from "./tween"
 
 export type TweenOptions = {
@@ -12,19 +13,16 @@ export abstract class Animation<W extends AnyWidget, DeferArgs extends Record<Pr
 
     public readonly widget: W
 
-    public readonly completed: Promise<boolean>
+    public readonly completed: Signal = new Signal()
 
     private ticker: number | undefined
-    // TODO: Extract into separate trackable class
-    public isCompleted: boolean = false
-    private markCompleted?: () => void
 
     static async waitCompletion(...animations: AnyAnimation[]) {
-        return Promise.allSettled(animations.map((animation) => animation.completed))
+        return Promise.allSettled(animations.map((animation) => animation.completed.promise))
     }
 
     protected interpolate<Shape extends Record<PropertyKey, number>>(from: Shape, to: Shape, delta: number) {
-        if (this.isCompleted) {
+        if (this.completed.value) {
             return to
         }
 
@@ -33,9 +31,7 @@ export abstract class Animation<W extends AnyWidget, DeferArgs extends Record<Pr
         }
 
         if (delta - this.ticker >= this.tween.duration) {
-            this.widget.layoutOverride = undefined
-            this.widget.optionsOverride = {}
-            this.markCompleted?.()
+            this.completed.trigger()
             return to
         }
 
@@ -47,16 +43,15 @@ export abstract class Animation<W extends AnyWidget, DeferArgs extends Record<Pr
     constructor(widget: W, tween: Tween) {
         this.widget = widget
         this.tween = tween
-
-        this.completed = new Promise((resolve) => {
-            this.markCompleted = () => {
-                this.isCompleted = true
-                resolve(true)
-            }
-        })
+        this.completed.promise.then(this.cleanup.bind(this))
     }
 
     abstract next(delta: number, ...deferArgs: ([DeferArgs] extends [never] ? [undefined?] : [DeferArgs])): void
+
+    cleanup() {
+        this.widget.layoutOverride = undefined
+        this.widget.optionsOverride = {}
+    }
 }
 
 export type AnyAnimation = Animation<AnyWidget, any>
