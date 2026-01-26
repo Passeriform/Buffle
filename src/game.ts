@@ -1,6 +1,5 @@
 import { Animation, AnimationManager, Easing, Tween } from "./animation"
 import { BlockMergeAnimation, BlockMoveAnimation, BlockSpawnAnimation, BlockUpgradeAnimation } from "./animationList"
-import { Direction } from "./controls"
 import { Block, BlockValue } from "./gui/block"
 import { ResponsiveContainer } from "./gui/responsiveContainer"
 import { Grid } from "./gui/grid"
@@ -11,6 +10,8 @@ import { computeNextBlockValue } from "./utility/difficulty"
 import { padLayout, rootLayout, splitHorizontal, splitVertical } from "./utility/layout"
 import { SparseMatrix } from "./utility/sparseMatrix"
 import type { DirectionalMatch } from "./matcher/directionalMatcher"
+
+export enum Direction { UP, DOWN, LEFT, RIGHT }
 
 // Config
 const gameSpeed = 1

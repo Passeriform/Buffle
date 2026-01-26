@@ -1,4 +1,4 @@
-import { Direction } from "./controls"
+import { Direction } from "./game"
 import { SortOrder, SparseMatrix } from "./utility/sparseMatrix"
 
 const sortOrderMapping = {
