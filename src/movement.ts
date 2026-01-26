@@ -8,7 +8,7 @@ const sortOrderMapping = {
     [Direction.RIGHT]: SortOrder.ROW_REVERSE,
 } as const
 
-type Move = [number, number]
+export type Move = [number, number]
 
 const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Direction) => {
     // TODO: Simplify this switch

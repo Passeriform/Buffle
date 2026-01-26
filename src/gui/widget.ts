@@ -2,9 +2,9 @@ import type { Layout } from "../utility/layout"
 
 export type WidgetOptions = {
     margin: number
+    // TODO: Add inherit to take up parent's opacity
     opacity: number
     padding: number
-    rounding: number
 }
 
 type RenderChain = `${"1" | "*"}${"1" | "*"}${"1" | "*"}`
@@ -52,7 +52,6 @@ export abstract class Widget<
             margin: 0,
             opacity: 1,
             padding: 0,
-            rounding: 0,
             ...options,
         } as Options
     }

@@ -17,10 +17,6 @@ export abstract class Animation<W extends AnyWidget, DeferArgs extends Record<Pr
 
     private ticker: number | undefined
 
-    static async waitCompletion(...animations: AnyAnimation[]) {
-        return Promise.allSettled(animations.map((animation) => animation.completed.promise))
-    }
-
     protected interpolate<Shape extends Record<PropertyKey, number>>(from: Shape, to: Shape, delta: number) {
         if (this.completed.value) {
             return to

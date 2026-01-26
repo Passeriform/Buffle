@@ -4,6 +4,7 @@ import { Widget, type WidgetOptions } from "./widget"
 type GridOptions = WidgetOptions & {
     background: string
     dimensions: [number, number]
+    rounding: number
     gap: number
 }
 
@@ -15,6 +16,7 @@ export class Grid extends Widget<GridOptions, never, "1**"> {
             background: "#5A2F28",
             dimensions: [4, 4],
             gap: 0,
+            rounding: 0,
             ...options,
         })
     }

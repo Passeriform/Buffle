@@ -17,12 +17,18 @@ export enum BlockValue {
 }
 
 export namespace BlockValue {
+    export const repr = (value: BlockValue): number => {
+        return 2 ** (value + 1)
+    }
+
     export const next = (value: BlockValue): BlockValue => {
         return value + 1 as BlockValue;
     }
 }
 
-type BlockOptions = WidgetOptions
+type BlockOptions = WidgetOptions & {
+    rounding: number
+}
 
 // TODO: Give bevel 3d look to block
 export class Block extends Widget<BlockOptions & { background: string }> {
@@ -52,7 +58,10 @@ export class Block extends Widget<BlockOptions & { background: string }> {
             throw new Error(`Invalid block value: ${value}`)
         }
 
-        super(options)
+        super({
+            rounding: 0,
+            ...options
+        })
 
         this._value = value
         this.makeDynamicOption("background", () => Block.COLOR_MAPPING[this._value])
@@ -84,15 +93,13 @@ export class Block extends Widget<BlockOptions & { background: string }> {
         return padLayout(layout, this.options.padding)
     }
 
-    get index(): Readonly<BlockValue> {
+    get value(): Readonly<BlockValue> {
         return this._value
     }
 
-    get value(): Readonly<BlockValue> {
-        return 2 ** (this._value + 1)
-    }
-
-    upgrade() {
-        this._value = BlockValue.next(this._value)
+    upgrade(targetValue: BlockValue = this._value + 1) {
+        while (this._value < targetValue) {
+            this._value = BlockValue.next(this._value)
+        }
     }
 }

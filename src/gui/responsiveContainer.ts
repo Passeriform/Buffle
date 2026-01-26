@@ -5,6 +5,7 @@ type ResponsiveContainerOptions = WidgetOptions & {
     background: string
     max: number
     min: number
+    rounding: number
 }
 
 export class ResponsiveContainer extends Widget<ResponsiveContainerOptions> {
@@ -13,6 +14,7 @@ export class ResponsiveContainer extends Widget<ResponsiveContainerOptions> {
             background: "#6B3C3300",
             max: 1600,
             min: 400,
+            rounding: 0,
             ...options,
         })
     }

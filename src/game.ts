@@ -5,31 +5,27 @@ import { Block, BlockValue } from "./gui/block"
 import { ResponsiveContainer } from "./gui/responsiveContainer"
 import { Grid } from "./gui/grid"
 import { Text } from "./gui/text"
-import type { AnyWidget } from "./gui/widget"
-import { computeMatches } from "./matcher"
+import { computeMatches } from "./matcher/matcher"
 import { computeMoves } from "./movement"
 import { computeNextBlockValue } from "./utility/difficulty"
 import { padLayout, rootLayout, splitVertical } from "./utility/layout"
 import { SparseMatrix } from "./utility/sparseMatrix"
+import type { DirectionalMatch } from "./matcher/directionalMatcher"
+import { parse } from "../tests/utility"
 
 // Config
 const gameSpeed = 1
 const gridDimensions = [4, 4] as [number, number]
 const moveTween = new Tween(200 / gameSpeed, Easing.EASE_IN_OUT)
 const mergeTween = new Tween(300 / gameSpeed, Easing.EASE_IN_OUT)
-const upgradeTween = new Tween(200 / gameSpeed, Easing.LINEAR)
-const spawnTween = new Tween(200 / gameSpeed, Easing.LINEAR)
+const upgradeTween = new Tween(300 / gameSpeed, Easing.LINEAR)
+const spawnTween = new Tween(200 / gameSpeed, Easing.EASE_IN_OUT)
 
 // Game state
 let totalMoves = 0
 let totalScore = 0
 const blockMap = new SparseMatrix<Block>([], gridDimensions)
-const animationManager: AnimationManager<AnyWidget,
-    | BlockMoveAnimation
-    | BlockMergeAnimation
-    | BlockUpgradeAnimation
-    | BlockSpawnAnimation
-> = new AnimationManager()
+const animationManager: AnimationManager = new AnimationManager()
 
 // GUI components
 const scoreText = new Text({
@@ -60,7 +56,6 @@ const blockValueText = new Text({
 
 // Movement
 const move = async (direction: Direction) => {
-    // FIXME: Sometimes unfilled 0th index is reported no moves. Possible bug in move computation
     const { moves } = computeMoves(blockMap, direction)
 
     if (!moves.length) {
@@ -69,9 +64,7 @@ const move = async (direction: Direction) => {
 
     const animations = moves.map(([current, targetIndex]) => new BlockMoveAnimation(blockMap.get(current)!, moveTween, { targetIndex }))
 
-    animations.forEach((animation) => animationManager.add(animation))
-
-    await Animation.waitCompletion(...animations)
+    await animationManager.wait(...animations)
 
     moves.forEach(([before, after]) => {
         blockMap.updateKey(before, after)
@@ -82,33 +75,52 @@ const move = async (direction: Direction) => {
 
 // Merge
 const merge = async (direction: Direction) => {
-    const { primary, secondary } = computeMatches(blockMap, direction, Block.equals, 3)
+    const { primary, secondary, special } = computeMatches(blockMap, direction, Block.equals, 3)
 
-    const matches = [...primary, ...secondary]
-
-    if (!matches.length) {
-        return matches.length
+    if (!primary.length && !secondary.length && !special.length) {
+        return primary.length + secondary.length + special.length
     }
 
-    const animations = matches.flatMap(({ indices }) => [
-        new BlockUpgradeAnimation(blockMap.get(indices[0])!, upgradeTween),
-        ...indices.slice(1).map((index) => new BlockMergeAnimation(blockMap.get(index)!, mergeTween, { targetIndex: indices[0] })),
-    ])
+    // TODO: Simplify animation queueing and automatically run them in draw loop
+    const mergeMatch = async (match: DirectionalMatch) => {
+        const matchBlockValues = match.indices.map((index) => blockMap.get(index)!.value)
+        const mergingList = match.indices.slice(1).map((index) => [index, match.indices[0]] as const)
+        const upgradingBlock = blockMap.get(match.indices[0])!
+        const maxBlockValue = (matchBlockValues as number[]).max() as BlockValue
+        const blockValueSum = matchBlockValues.map((value) => BlockValue.repr(value)).sum()
 
-    animations.forEach((animation) => animationManager.add(animation))
-
-    await Animation.waitCompletion(...animations)
-
-    matches.forEach(({ indices }) => {
-        const block = blockMap.get(indices[0])!
-        totalScore += block.value * indices.length
-        block.upgrade()
-        indices.slice(1).forEach((index) => {
-            blockMap.delete(index)
+        const mergeAnimations = mergingList.map(([sourceIndex, targetIndex]) => {
+            const animation = new BlockMergeAnimation(blockMap.get(sourceIndex)!, mergeTween, { targetIndex })
+            animationManager.onCompletion([animation], () => {
+                blockMap.delete(sourceIndex)
+            })
+            return animation
         })
-    })
+        const upgradeAnimation = new BlockUpgradeAnimation(upgradingBlock, upgradeTween)
+        animationManager.onCompletion([upgradeAnimation], () => {
+            upgradingBlock.upgrade(BlockValue.next(maxBlockValue))
+        })
 
-    return matches.reduce((blockCount, { indices }) => blockCount + indices.length, 0)
+        animationManager.onCompletion(mergeAnimations, () => {
+            totalScore += blockValueSum
+        })
+
+        await animationManager.wait(...mergeAnimations, upgradeAnimation)
+
+        return match.indices.length
+    }
+
+    const mergedBlocks = (await Promise.all([
+        ...primary.map(mergeMatch),
+        ...secondary.map(mergeMatch),
+        // FIXME: Async updates to game state cause missed updates in upgrade.
+        ...special.flatMap(({ matchGroups }) => matchGroups.reduceSequence(async (blockCount, matches) => {
+            const mergeCounts = await Promise.all(matches.map(mergeMatch))
+            return blockCount + mergeCounts.sum()
+        }, 0)),
+    ])).flat().sum()
+
+    return mergedBlocks
 }
 
 // Spawn
@@ -119,11 +131,7 @@ const spawn = async () => {
     const spawnBlock = block.clone(spawnValue)
     blockMap.set(spawnIndex, spawnBlock)
 
-    const animation = new BlockSpawnAnimation(spawnBlock, spawnTween)
-
-    animationManager.add(animation)
-
-    await Animation.waitCompletion(animation)
+    await animationManager.wait(new BlockSpawnAnimation(spawnBlock, spawnTween))
 }
 
 // Initializer
@@ -188,13 +196,13 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
                         to: blockSlots[animation.metadata.targetIndex]
                     })
                 } else {
-                    animation.next(delta)
+                    (animation as Animation<Block>).next(delta)
                 }
             })
         }
 
         const valueSlot = block.render(ctx, blockSlots[index])
-        blockValueText.render(ctx, valueSlot, `${block.value}`)
+        blockValueText.render(ctx, valueSlot, `${BlockValue.repr(block.value)}`)
     })
 
     // Recurse calls
