@@ -1,5 +1,5 @@
-import { bindControls, bindReset } from "./controls"
-import { draw, init, reset, update } from "./game"
+import { bindControls } from "./controls"
+import { draw, init, update } from "./game"
 import { createCanvas } from "./utility/canvas"
 import "./utility/array"
 
@@ -9,6 +9,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     init()
     bindControls(document.body, update)
-    bindReset(document.body, reset)
     draw(0, ctx)
 })
