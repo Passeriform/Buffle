@@ -10,6 +10,7 @@ type TextOptions = WidgetOptions & {
 
 type TextWidgetState = string
 
+// TODO: Convert to DOM based widget
 export class Text extends Widget<TextOptions, TextWidgetState> {
     constructor(options: Partial<TextOptions> = {}) {
         super({

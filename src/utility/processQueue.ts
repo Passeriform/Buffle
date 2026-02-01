@@ -1,6 +1,7 @@
 type Task<T> = () => T | Promise<T>
 
 export class ProcessQueue<T = unknown> {
+    // TODO: Add TTL property and timestamp to cancel tasks that cross deadline to get processed.
     private queue: Task<T>[] = []
     private results: T[] = []
     private running = false

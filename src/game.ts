@@ -1,6 +1,5 @@
 import { Animation, AnimationManager, Easing, Tween } from "./animation"
 import { BlockMergeAnimation, BlockMoveAnimation, BlockSpawnAnimation, BlockUpgradeAnimation } from "./animationList"
-import { Direction } from "./controls"
 import { Block, BlockValue } from "./gui/block"
 import { ResponsiveContainer } from "./gui/responsiveContainer"
 import { Grid } from "./gui/grid"
@@ -11,7 +10,8 @@ import { computeNextBlockValue } from "./utility/difficulty"
 import { padLayout, rootLayout, splitVertical } from "./utility/layout"
 import { SparseMatrix } from "./utility/sparseMatrix"
 import type { DirectionalMatch } from "./matcher/directionalMatcher"
-import { parse } from "../tests/utility"
+
+export enum Direction { UP, DOWN, LEFT, RIGHT }
 
 // Config
 const gameSpeed = 1
@@ -24,6 +24,7 @@ const spawnTween = new Tween(200 / gameSpeed, Easing.EASE_IN_OUT)
 // Game state
 let totalMoves = 0
 let totalScore = 0
+let gameOver = false
 const blockMap = new SparseMatrix<Block>([], gridDimensions)
 const animationManager: AnimationManager = new AnimationManager()
 
@@ -46,6 +47,7 @@ const block = new Block(BlockValue.TWO, {
     padding: 20,
     rounding: 20,
 })
+// TODO: Move inside block widget
 const blockValueText = new Text({
     margin: 20,
     color: "#6A4537",
@@ -134,6 +136,20 @@ const spawn = async () => {
     await animationManager.wait(new BlockSpawnAnimation(spawnBlock, spawnTween))
 }
 
+const reset = () => {
+    if (!gameOver) {
+        return
+    }
+
+    totalMoves = 0
+    totalScore = 0
+    gameOver = false
+
+    blockMap.clear()
+
+    init()
+}
+
 // Initializer
 export const init = () => {
     // TODO: Add spawn animation for init
@@ -144,6 +160,7 @@ export const init = () => {
 }
 
 // TODO: Cancel an update if previous takes too long
+// TODO: Add context based input handling
 
 // Update handler
 export const update = async (direction: Direction) => {
@@ -165,6 +182,14 @@ export const update = async (direction: Direction) => {
     totalMoves++
 
     await spawn()
+
+    // TODO: Check another round for merges after spawning a new block
+
+    // Check for game over
+    if (blockMap.size === blockMap.maxSize) {
+        gameOver = true
+        showGameOver(totalScore, totalMoves, reset)
+    }
 }
 
 // Draw loop

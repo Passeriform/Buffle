@@ -1,4 +1,4 @@
-import { Direction } from "../controls"
+import { Direction } from "../game"
 import type { SparseMatrix } from "../utility/sparseMatrix"
 import { getDirectionalMatches, getSecondaryDirection } from "./directionalMatcher"
 import { extractSpecialMatches } from "./specialMatcher"

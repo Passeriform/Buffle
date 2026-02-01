@@ -1,34 +1,21 @@
+import { Direction } from "./game"
 import { ProcessQueue } from "./utility/processQueue"
 
-export enum Direction { UP, DOWN, LEFT, RIGHT }
+export const bindControls = (root: HTMLElement, handler: (action: Direction) => void) => {
+    const processQueue = new ProcessQueue()
 
-// TODO: Add bindGamepad
+    processQueue.run()
 
-const bindKeyboard = (root: HTMLElement, handler: (action: Direction) => void, queue: ProcessQueue) => {
+    // Bind Keyboard
     root.addEventListener("keydown", (e) => {
-        const direction = {
-            "ArrowUp": Direction.UP,
-            "w": Direction.UP,
-            "W": Direction.UP,
-            "ArrowDown": Direction.DOWN,
-            "s": Direction.DOWN,
-            "S": Direction.DOWN,
-            "ArrowLeft": Direction.LEFT,
-            "a": Direction.LEFT,
-            "A": Direction.LEFT,
-            "ArrowRight": Direction.RIGHT,
-            "d": Direction.RIGHT,
-            "D": Direction.RIGHT,
-        }[e.key]
-
-        if (direction !== undefined) {
-            queue.addTask(() => handler(direction))
-        }
+        if (["ArrowUp", "w", "W"].includes(e.key)) processQueue.addTask(() => handler(Direction.UP))
+        else if (["ArrowDown", "s", "S"].includes(e.key)) processQueue.addTask(() => handler(Direction.DOWN))
+        else if (["ArrowLeft", "a", "A"].includes(e.key)) processQueue.addTask(() => handler(Direction.LEFT))
+        else if (["ArrowRight", "d", "D"].includes(e.key)) processQueue.addTask(() => handler(Direction.RIGHT))
     })
-}
 
-const bindPointer = (root: HTMLElement, handler: (action: Direction) => void, queue: ProcessQueue) => {
-        const dragState = new Map<number, { x: number, y: number }>()
+    // Bind Pointer
+    const dragState = new Map<number, { x: number, y: number }>()
 
     root.addEventListener("pointerdown", (e) =>
         dragState.set(e.pointerId, { x: e.clientX, y: e.clientY })
@@ -47,9 +34,9 @@ const bindPointer = (root: HTMLElement, handler: (action: Direction) => void, qu
         const dy = e.clientY - start.y
 
         if (Math.abs(dx) > Math.abs(dy))
-            queue.addTask(() => handler(dx > 0 ? Direction.RIGHT : Direction.LEFT))
+            processQueue.addTask(() => handler(dx > 0 ? Direction.RIGHT : Direction.LEFT))
         else
-            queue.addTask(() => handler(dy > 0 ? Direction.DOWN : Direction.UP))
+            processQueue.addTask(() => handler(dy > 0 ? Direction.DOWN : Direction.UP))
     })
 
     root.addEventListener("pointercancel", (e) =>
@@ -57,13 +44,7 @@ const bindPointer = (root: HTMLElement, handler: (action: Direction) => void, qu
     )
 
     document.body.style.touchAction = "none"
-}
 
-export const bindControls = (root: HTMLElement, handler: (action: Direction) => void) => {
-    const processQueue = new ProcessQueue()
+    // TODO: Add bindGamepad
 
-    processQueue.run()
-
-    bindKeyboard(root, handler, processQueue)
-    bindPointer(root, handler, processQueue)
 }

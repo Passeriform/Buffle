@@ -98,6 +98,14 @@ export class SparseMatrix<V> {
         return true
     }
 
+    clear() {
+        this.map.clear()
+
+        this.keys = []
+
+        return true
+    }
+
     updateKey(key: number, newKey: number) {
         const value = this.get(key)
 
