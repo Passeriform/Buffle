@@ -10,8 +10,8 @@ import { computeNextBlockValue } from "./utility/difficulty"
 import { padLayout, rootLayout, splitVertical } from "./utility/layout"
 import { SparseMatrix } from "./utility/sparseMatrix"
 import type { DirectionalMatch } from "./matcher/directionalMatcher"
-
-export enum Direction { UP, DOWN, LEFT, RIGHT }
+import type { Direction } from "./constants"
+import { showGameOver } from "./gameOver"
 
 // Config
 const gameSpeed = 1

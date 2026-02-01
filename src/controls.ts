@@ -1,5 +1,7 @@
-import { Direction } from "./game"
+import { Direction } from "./constants"
 import { ProcessQueue } from "./utility/processQueue"
+
+// TODO: Add bindGamepad
 
 export const bindControls = (root: HTMLElement, handler: (action: Direction) => void) => {
     const processQueue = new ProcessQueue()

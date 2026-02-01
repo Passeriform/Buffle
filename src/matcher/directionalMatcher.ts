@@ -1,4 +1,4 @@
-import { Direction } from "../game"
+import { Direction } from "../constants"
 import { SortOrder, type SparseMatrix } from "../utility/sparseMatrix"
 
 export type DirectionalMatch = {
