@@ -9,33 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/canvas.css">
-    <link rel="stylesheet" href="/gameover.css">
 </head>
 
 <body>
-    <div id="root">
-        <div class="modal hidden" id="gameover">
-            <div class="backdrop"></div>
-            <div class="splash">
-                <h1 class="heading">GAME OVER</h1>
-                <section class="stats">
-                    <div class="block">
-                        <h3 class="heading">Score</h3>
-                        <div class="content">
-                            <h2 id="score"></h2>
-                        </div>
-                    </div>
-                    <div class="block">
-                        <h3 class="heading">Moves</h3>
-                        <div class="content">
-                            <h2 id="moves"></h2>
-                        </div>
-                    </div>
-                </section>
-                <a id="retry" href="javascript:void(0);">Press (r) to restart</a>
-            </div>
-        </div>
-    </div>
+    <div id="root"></div>
+    <buffle-game-over restart-key="r"></buffle-game-over>
+    <script type="module" src="./src/components/registry.ts"></script>
     <script type="module" src="./src/main.ts"></script>
 </body>
 

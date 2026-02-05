@@ -22,7 +22,7 @@ export const createCanvas = (elementTag: string, background: string = "#FFFFFF")
 
     canvas.id = CANVAS_ID
 
-    root.appendChild(canvas)
+    root.append(canvas)
 
     fitCanvas()
 

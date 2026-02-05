@@ -22,7 +22,7 @@ export namespace BlockValue {
     }
 
     export const next = (value: BlockValue): BlockValue => {
-        return value + 1 as BlockValue;
+        return value + 1 as BlockValue
     }
 }
 

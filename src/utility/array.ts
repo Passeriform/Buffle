@@ -4,7 +4,7 @@ declare global {
         partition(this: T[], predicate: (item: T) => boolean): [Array<T>, Array<T>]
         sum(this: T extends number ? T[] : never): number
         max(this: T extends number ? T[] : never): number
-        reduceSequence<U>(this: T[], callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => Promise<U>, initialValue: U): Promise<U>;
+        reduceSequence<U>(this: T[], callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => Promise<U>, initialValue: U): Promise<U>
     }
 }
 

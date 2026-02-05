@@ -164,6 +164,10 @@ export const init = () => {
 
 // Update handler
 export const update = async (direction: Direction) => {
+    if (gameOver) {
+        return
+    }
+
     let updatePerformed = false
     let loopPerformed = false
 
@@ -187,6 +191,7 @@ export const update = async (direction: Direction) => {
 
     // Check for game over
     if (blockMap.size === blockMap.maxSize) {
+        // TODO: Move together when state moves into a separate class
         gameOver = true
         showGameOver(totalScore, totalMoves, reset)
     }
