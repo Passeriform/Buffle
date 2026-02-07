@@ -1,0 +1,69 @@
+:host {
+    width: 100%;
+}
+
+:host > table {
+    width: 100%;
+    text-align: center;
+    background-color: #6B3C33;
+    border: 0.5rem solid #6B3C33;
+    border-radius: 0.5rem;
+    border-top: none;
+    border-spacing: 0.1rem;
+}
+
+:host > table > tbody {
+    background-color: #FF7E5E;
+}
+
+:host > table > tbody > tr > td {
+    padding: 1rem;
+}
+
+:host > table > tbody > tr:first-of-type > td:first-of-type {
+    border-top-left-radius: 0.5rem;
+}
+
+:host > table > tbody > tr:first-of-type > td:last-of-type {
+    border-top-right-radius: 0.5rem;
+}
+
+:host > table > tbody > tr:last-of-type > td:first-of-type {
+    border-bottom-left-radius: 0.5rem;
+}
+
+:host > table > tbody > tr:last-of-type > td:last-of-type {
+    border-bottom-right-radius: 0.5rem;
+}
+
+:host > table > thead > tr > th > h3 {
+    margin: 0.5rem;
+}
+
+:host > table > tbody > tr > td > h2 {
+    margin: 0;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(1turn);
+    }
+}
+
+:host #loader > .spinner {
+    width: 2rem;
+    margin: 0 auto;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #6B3C33;
+    --spin-gradient: conic-gradient(#0000 5%, #000), linear-gradient(#000 0 0) content-box;
+    mask: var(--spin-gradient);
+    mask-composite: subtract;
+    animation: spin 1s infinite linear;
+}
+
+:host #loader > .text {
+    margin: 0;
+}

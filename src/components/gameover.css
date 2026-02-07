@@ -25,6 +25,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 1rem;
+    border: 0.5rem solid #6B3C33;
     background-color: #271612;
     box-shadow: 0 0 1.2rem 0.5rem #1F1412;
     z-index: 1;
@@ -73,8 +74,8 @@
 
 :host > .splash > .action {
     font-family: monospace;
-    margin-top: 4rem;
-    font-size: 2vw;
+    margin: 4rem;
+    font-size: clamp(1rem, 2vw, 1.5rem);
     font-weight: 500;
     color: #32a4ce;
     border: none;
