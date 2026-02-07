@@ -1,5 +1,5 @@
 export enum GameType {
-    CLASSIC = "CLASSIC"
+    CLASSIC = "classic"
 }
 
 export enum Direction { UP, DOWN, LEFT, RIGHT }

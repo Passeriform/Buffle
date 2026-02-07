@@ -13,7 +13,9 @@
 
 <body>
     <div id="root"></div>
-    <buffle-game-over restart-key="r"></buffle-game-over>
+    <buffle-game-over restart-key="r">
+        <buffle-leaderboard game-type="classic" slot="child"></buffle-leaderboard>
+    </buffle-game-over>
     <script type="module" src="./src/components/registry.ts"></script>
     <script type="module" src="./src/main.ts"></script>
 </body>

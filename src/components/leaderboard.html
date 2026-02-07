@@ -1,0 +1,31 @@
+<template>
+    <table>
+        <thead>
+            <tr>
+                <th><h3>Rank</h3></th>
+                <th><h3>Player Name</h3></th>
+                <th><h3>Score</h3></th>
+                <th><h3>Moves</h3></th>
+            </tr>
+        </thead>
+        <tbody data-slot></tbody>
+    </table>
+
+    <template data-loader>
+        <tr>
+            <td colspan="4" id="loader">
+                <div class="spinner"></div>
+                <h3 class="text">Loading...</h3>
+            </td>
+        </tr>
+    </template>
+
+    <template data-row>
+        <tr>
+            <td><h2 data-rank></h2></td>
+            <td><h2 data-name></h2></td>
+            <td><h2 data-score></h2></td>
+            <td><h2 data-moves></h2></td>
+        </tr>
+    </template>
+</template>

@@ -50,7 +50,7 @@ export class GameOverElement extends HTMLElement {
     }
 
     connectedCallback() {
-        const restartButton = this.#root.getElementById("restart") as HTMLButtonElement
+        const restartButton = this.#root.querySelector("[data-restart]") as HTMLButtonElement
 
         this.#loadRestartKeys()
 
@@ -67,11 +67,11 @@ export class GameOverElement extends HTMLElement {
     }
 
     set score(value: number) {
-        this.#root.getElementById("score")!.textContent = String(value)
+        this.#root.querySelector("[data-score]")!.textContent = String(value)
     }
 
     set moves(value: number) {
-        this.#root.getElementById("moves")!.textContent = String(value)
+        this.#root.querySelector("[data-moves]")!.textContent = String(value)
     }
 
     show() {
