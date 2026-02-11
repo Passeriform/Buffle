@@ -1,4 +1,5 @@
 import { GameOverElement } from "./gameover"
+import { LeaderboardElement } from "./leaderboard"
 
 type CustomElementCtor = {
     new(): HTMLElement
@@ -7,6 +8,7 @@ type CustomElementCtor = {
 
 const additionalElements = [
     GameOverElement,
+    LeaderboardElement,
 ] as const satisfies CustomElementCtor[]
 
 type ElementUnion = typeof additionalElements[number]
@@ -23,6 +25,7 @@ type CustomElementTagMap = {
 
 type CustomElementEventMap =
     & GameOverElement.EVENTS
+    & LeaderboardElement.EVENTS
 
 declare global {
     interface HTMLElementTagNameMap extends CustomElementTagMap { }

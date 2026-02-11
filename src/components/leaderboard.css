@@ -1,23 +1,14 @@
-:host {
-    width: 100%;
-}
-
 :host > table {
-    width: 100%;
     text-align: center;
     background-color: #6B3C33;
     border: 0.5rem solid #6B3C33;
-    border-radius: 0.5rem;
     border-top: none;
     border-spacing: 0.1rem;
+    border-radius: 0.5rem;
 }
 
 :host > table > tbody {
     background-color: #FF7E5E;
-}
-
-:host > table > tbody > tr > td {
-    padding: 1rem;
 }
 
 :host > table > tbody > tr:first-of-type > td:first-of-type {
@@ -36,12 +27,36 @@
     border-bottom-right-radius: 0.5rem;
 }
 
+:host > table > tbody > tr.highlight {
+    background-color: #FF9B84;
+}
+
 :host > table > thead > tr > th > h3 {
     margin: 0.5rem;
 }
 
 :host > table > tbody > tr > td > h2 {
-    margin: 0;
+    margin: 1rem 5vw;
+}
+
+:host > table > tbody > tr > td > input {
+    margin: 0.25rem;
+    padding: 1rem 1rem;
+    font-size: 1.5rem;
+    text-align: center;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: transparent;
+}
+
+:host > table > tbody > tr > td > input:hover {
+    outline: 0.2rem solid #6B3C33;
+}
+
+:host > table > tbody > tr > td > input:focus {
+    background-color: #6B3C33;
+    box-shadow: 0 0 0.3rem 0.05rem #1F1412 inset;
+    outline: none
 }
 
 @keyframes spin {
