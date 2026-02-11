@@ -21,23 +21,21 @@
 :host > .splash {
     display: flex;
     flex-direction: column;
+    gap: 2rem;
     padding: 2rem;
+    min-width: 25rem;
     align-items: center;
     justify-content: center;
-    border-radius: 1rem;
     border: 0.5rem solid #6B3C33;
+    border-radius: 1rem;
     background-color: #271612;
     box-shadow: 0 0 1.2rem 0.5rem #1F1412;
     z-index: 1;
 }
 
-:host > .splash > * {
-    margin: 1rem 0;
-}
-
 :host > .splash > .heading {
-    font-size: 10vw;
-    margin: 1rem;
+    margin: 0 1rem;
+    font-size: clamp(4rem, 10vw, 10rem);
 }
 
 :host > .splash > .stats {
@@ -50,8 +48,7 @@
 :host > .splash > .stats > .block {
     display: flex;
     flex-direction: column;
-    flex-basis: 33%;
-    padding: 0;
+    width: clamp(10rem, 20vw, 20rem);
     justify-content: center;
     align-items: center;
     border-radius: 0.5rem;
@@ -64,22 +61,22 @@
 
 :host > .splash > .stats > .block > .content {
     display: flex;
-    width: 93%;
-    margin-bottom: 0.5rem;
+    width: calc(100% - 1rem);
     justify-content: center;
     align-items: center;
+    margin-bottom: 0.5rem;
     border-radius: 0.5rem;
     background-color: #FF9B84;
 }
 
 :host > .splash > .action {
+    margin: 2rem;
     font-family: monospace;
-    margin: 4rem;
-    font-size: clamp(1rem, 2vw, 1.5rem);
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
     font-weight: 500;
     color: #32a4ce;
-    border: none;
     background: none;
+    border: none;
     cursor: pointer;
 }
 

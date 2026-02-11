@@ -2,14 +2,14 @@ import rawTemplate from "./gameover.html?raw"
 import rawStyleSheet from "./gameover.css?raw"
 import { parseTemplate, parseStyleSheet } from "../utility/dom"
 
+export declare namespace GameOverElement {
+    export type EVENTS = {
+        "restart": CustomEvent<never>
+    }
+}
+
 export class GameOverElement extends HTMLElement {
     static TAG = "buffle-game-over" as const
-    static EVENTS = {
-        "restart": new CustomEvent<never>("restart", {
-            bubbles: true,
-            composed: true,
-        })
-    }
     static DEFAULT_RESTART_KEY = "r"
 
     #root: ShadowRoot
@@ -46,7 +46,10 @@ export class GameOverElement extends HTMLElement {
             return
         }
 
-        this.dispatchEvent(GameOverElement.EVENTS.restart)
+        this.dispatchEvent(new CustomEvent("restart", {
+            bubbles: true,
+            composed: true,
+        }))
     }
 
     connectedCallback() {
