@@ -32,7 +32,8 @@
     <template data-row-editable>
         <tr class="highlight">
             <td><h2 data-rank></h2></td>
-            <td><input maxlength=20 data-name/></td>
+            <td><input id="name-input" maxlength=20 data-name/></td>
+            <buffle-popover anchor="name-input"><input data-taunt/></buffle-popover>
             <td><h2 data-score></h2></td>
             <td><h2 data-moves></h2></td>
         </tr>
