@@ -1,5 +1,6 @@
 import { GameOverElement } from "./gameover"
 import { LeaderboardElement } from "./leaderboard"
+import { PopoverElement } from "./popover"
 
 type CustomElementCtor = {
     new(): HTMLElement
@@ -9,6 +10,7 @@ type CustomElementCtor = {
 const additionalElements = [
     GameOverElement,
     LeaderboardElement,
+    PopoverElement,
 ] as const satisfies CustomElementCtor[]
 
 type ElementUnion = typeof additionalElements[number]

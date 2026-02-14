@@ -1,0 +1,23 @@
+:host {
+    --tail-size: 16;
+    --tail-offset: 48;
+    --inline-offset: 48;
+    --block-offset: -8;
+}
+
+:host {
+    display: block;
+    position: absolute;
+    border-radius: 0.8rem;
+    background-color: #FF9B84;
+    z-index: 1000;
+    mask-repeat: no-repeat;
+}
+
+:host(:not([show])) {
+    display: none;
+}
+
+:host(:focus-within), :host([child-hover]) {
+    background-color: #6B3C33;
+}

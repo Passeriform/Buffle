@@ -10,7 +10,6 @@ export const parseTemplate = (rawHtml: string) => {
     return template as HTMLTemplateElement
 }
 
-
 export const parseStyleSheet = (rawCss: string) => {
     const sheet = new CSSStyleSheet()
     sheet.replaceSync(rawCss)
