@@ -1,20 +1,14 @@
 import rawHtml from "./leaderboard.html?raw"
 import rawStyleSheet from "./leaderboard.css?raw"
 import { parseTemplate, parseStyleSheet } from "../utility/dom"
+import { loadScores, type LeaderboardData } from "../api"
+import type { GameType } from "../constants"
 
 export declare namespace LeaderboardElement {
     export type EVENTS = {
         "update:name": CustomEvent<string>
         "update:taunt": CustomEvent<string>
     }
-}
-
-type LeaderboardData = {
-    id: number
-    name: string
-    score: number
-    moves: number
-    taunt: string
 }
 
 export class LeaderboardElement extends HTMLElement {
@@ -112,30 +106,7 @@ export class LeaderboardElement extends HTMLElement {
     async #loadData() {
         this.#renderLoader()
 
-        const dataApiUrl = new URL(import.meta.env.VITE_SUPABASE_ENDPOINT)
-        dataApiUrl.pathname = `/rest/v1/${import.meta.env.VITE_LEADERBOARD_TABLE}`
-        dataApiUrl.searchParams.append("select", "id,name,moves,score,taunt")
-        dataApiUrl.searchParams.append("game_type", `eq.${this.getAttribute("game-type")!}`)
-        dataApiUrl.searchParams.append("order", "score.desc")
-        dataApiUrl.searchParams.append("limit", "15")
-
-        try {
-            const response = await fetch(dataApiUrl, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    apikey: import.meta.env.VITE_SUPABASE_API_KEY,
-                },
-            })
-
-            if (!response.ok) {
-                throw Error(`Data couldn't be loaded: ${response.statusText}`)
-            }
-
-            this.#data = await response.json()
-        } catch (err) {
-            throw Error(`Data couldn't be loaded: ${err}`)
-        }
+        this.#data = await loadScores(this.getAttribute("game-type")! as GameType)
 
         this.#renderData()
     }
