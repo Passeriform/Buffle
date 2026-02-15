@@ -11,7 +11,7 @@ import { padLayout, rootLayout, splitVertical } from "./utility/layout"
 import { SparseMatrix } from "./utility/sparseMatrix"
 import type { DirectionalMatch } from "./matcher/directionalMatcher"
 import type { Direction } from "./constants"
-import { showGameOver } from "./gameOver"
+import { showGameOver } from "./finalize"
 
 // Config
 const gameSpeed = 1

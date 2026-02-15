@@ -1,22 +1,26 @@
 import rawHtml from "./leaderboard.html?raw"
 import rawStyleSheet from "./leaderboard.css?raw"
 import { parseTemplate, parseStyleSheet } from "../utility/dom"
+import { loadScores, type LeaderboardData } from "../api"
+import type { GameType } from "../constants"
 
-type LeaderboardData = {
-    name: string
-    score: number
-    moves: number
+export declare namespace LeaderboardElement {
+    export type EVENTS = {
+        "update:name": CustomEvent<string>
+        "update:taunt": CustomEvent<string>
+    }
 }
 
 export class LeaderboardElement extends HTMLElement {
     static TAG = "buffle-leaderboard" as const
-    static EVENTS = {}
 
     readonly #root: ShadowRoot
     readonly #bodySlot: HTMLTableSectionElement
+    #editableId?: number
 
     #loaderTemplate: HTMLTemplateElement
     #rowTemplate: HTMLTemplateElement
+    #editableRowTemplate: HTMLTemplateElement
 
     #data: LeaderboardData[] = []
 
@@ -30,10 +34,32 @@ export class LeaderboardElement extends HTMLElement {
         this.#bodySlot = this.#root.querySelector("[data-slot]")!
         this.#loaderTemplate = this.#root.querySelector("[data-loader]")!
         this.#rowTemplate = this.#root.querySelector("[data-row]")!
+        this.#editableRowTemplate = this.#root.querySelector("[data-row-editable]")!
     }
 
     static get observedAttributes() {
         return ["game-type"]
+    }
+
+    #addInputListeners = (input: HTMLInputElement, event: string) => {
+        input.addEventListener("focus", () => {
+            input.select()
+        })
+        input.addEventListener("keydown", (e) => {
+            e.stopPropagation()
+
+            if (e.key === "Enter") {
+                input.blur()
+            }
+        })
+        input.addEventListener("blur", () => {
+            input.setSelectionRange(0, 0)
+            this.dispatchEvent(new CustomEvent(event, {
+                bubbles: true,
+                composed: true,
+                detail: input.value,
+            }))
+        })
     }
 
     #renderLoader() {
@@ -41,13 +67,35 @@ export class LeaderboardElement extends HTMLElement {
     }
 
     #renderData() {
-        const rows = this.#data.map(({ name, score, moves }, idx) => {
-            const row = this.#rowTemplate.content.cloneNode(true) as DocumentFragment
+        const rows = this.#data.map(({ id, name, score, moves, taunt }, idx) => {
+            const row = (id === this.#editableId ? this.#editableRowTemplate : this.#rowTemplate).content.cloneNode(true) as DocumentFragment
 
             row.querySelector("[data-rank]")!.textContent = `${idx + 1}`
-            row.querySelector("[data-name]")!.textContent = name
             row.querySelector("[data-score]")!.textContent = `${score}`
             row.querySelector("[data-moves]")!.textContent = `${moves}`
+
+            if (id === this.#editableId) {
+                const nameInput = row.querySelector("[data-name]")! as HTMLInputElement
+                nameInput.value = name
+                this.#addInputListeners(nameInput, "update:name")
+
+                const tauntInput = row.querySelector("[data-taunt]")! as HTMLInputElement
+                tauntInput.value = taunt
+                tauntInput.placeholder = "Burn the opposition with a taunt"
+                this.#addInputListeners(tauntInput, "update:taunt")
+
+                const popover = row.querySelector("buffle-popover")!
+
+                nameInput.addEventListener("focus", () => popover.show())
+                nameInput.addEventListener("blur", (e) => {
+                    if (e.relatedTarget !== tauntInput) {
+                        popover.hide()
+                    }
+                })
+                tauntInput.addEventListener("blur", () => popover.hide())
+            } else {
+                row.querySelector("[data-name]")!.textContent = name
+            }
 
             return row
         })
@@ -58,32 +106,17 @@ export class LeaderboardElement extends HTMLElement {
     async #loadData() {
         this.#renderLoader()
 
-        const dataApiUrl = new URL(import.meta.env.VITE_SUPABASE_REST_ENDPOINT)
-        dataApiUrl.pathname = `/rest/v1/${import.meta.env.VITE_LEADERBOARD_TABLE}`
-        dataApiUrl.searchParams.append("select", "name,moves,score")
-        dataApiUrl.searchParams.append("game_type", `eq.${this.getAttribute("game-type")!}`)
-        dataApiUrl.searchParams.append("order", "score.desc")
-        dataApiUrl.searchParams.append("limit", "15")
-
-        try {
-            const res = await fetch(dataApiUrl, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "apiKey": import.meta.env.VITE_SUPABASE_API_KEY,
-                },
-            })
-
-            if (!res.ok) {
-                throw Error("Data couldn't be loaded")
-            }
-
-            this.#data = await res.json()
-        } catch (err) {
-            throw Error(`Data couldn't be loaded: ${err}`)
-        }
+        this.#data = await loadScores(this.getAttribute("game-type")! as GameType)
 
         this.#renderData()
+    }
+
+    set editableId(value: number | undefined) {
+        this.#editableId = value
+    }
+
+    refresh() {
+        this.#loadData()
     }
 
     connectedCallback() {

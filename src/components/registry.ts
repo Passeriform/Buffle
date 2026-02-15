@@ -1,15 +1,16 @@
 import { GameOverElement } from "./gameover"
 import { LeaderboardElement } from "./leaderboard"
+import { PopoverElement } from "./popover"
 
 type CustomElementCtor = {
     new(): HTMLElement
     TAG: string
-    EVENTS: Record<string, CustomEvent>
 }
 
 const additionalElements = [
     GameOverElement,
     LeaderboardElement,
+    PopoverElement,
 ] as const satisfies CustomElementCtor[]
 
 type ElementUnion = typeof additionalElements[number]
@@ -24,9 +25,9 @@ type CustomElementTagMap = {
     [K in ElementUnion["TAG"]]: InstanceType<Extract<ElementUnion, { TAG: K }>>
 }
 
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I  : never
-
-type CustomElementEventMap = UnionToIntersection<ElementUnion["EVENTS"]>
+type CustomElementEventMap =
+    & GameOverElement.EVENTS
+    & LeaderboardElement.EVENTS
 
 declare global {
     interface HTMLElementTagNameMap extends CustomElementTagMap { }
