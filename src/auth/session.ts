@@ -1,7 +1,7 @@
 import { initDB } from "./indexedDb"
 
 const DB_NAME = "authDB"
-const STORE_NAME = "sessions"
+const SESSION_STORE_NAME = "sessions"
 const SESSION_KEY = "session"
 
 const createAnonUserUrl = new URL(import.meta.env.VITE_SUPABASE_ENDPOINT)
@@ -72,7 +72,7 @@ const refreshSession = async (session: ClientSession) => {
 }
 
 export const initSession = async () => {
-    const db = await initDB(DB_NAME, STORE_NAME)
+    const db = await initDB(DB_NAME, SESSION_STORE_NAME)
 
     const existingSession = await db.get<ClientSession>(SESSION_KEY)
 
