@@ -1,5 +1,10 @@
 ☐ Add configuration handler for palette, sizing, game speed, pattern stencil swap
 
+☐ Celebration on breaching a block
+☐ Celebration on high score breach
+☐ Make application responsive for mobile devices
+☐ Extract into ChiselJS library
+
 Recommendations:
     ☐ Raised blocks for visual clarity
     ☐ Add powers for >3 matches and match patterns
@@ -16,3 +21,11 @@ Game over screen:
         ☐ Clear animation manager
         ☐ Pause primary update loop
         ☐ Bind game over controls loop
+
+Crazy:
+    ☐ Play 4 o'clock sound byte at 4 o'clock localtime
+    ☐ Give undo feature that deploys the last build and serves that instead
+    ☐ Game mode on a big grid with snake like gameplay for match 3
+    ☐ Immovable obstacle blocks
+    ☐ Movable obstacle blocks
+    ☐ Game mode to spell letters of words with blocks
