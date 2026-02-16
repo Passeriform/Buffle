@@ -33,17 +33,17 @@ const scoreText = new Text()
 const board = new ResponsiveContainer({
     background: "#6b3c33",
     padding: "2%",
-    rounding: "2%",
+    rounding: "4%",
     min: 50,
 })
 const grid = new Grid({
-    gap: "4.5%",
-    rounding: "10%",
+    gap: "8%",
+    rounding: "20%",
     dimensions: gridDimensions,
 })
 const block = new Block(BlockValue.TWO, {
-    padding: "15%",
-    rounding: "10%",
+    padding: "20%",
+    rounding: "20%",
 })
 // TODO: Move inside block widget
 const blockValueText = new Text({
