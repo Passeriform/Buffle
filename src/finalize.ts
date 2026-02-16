@@ -24,12 +24,12 @@ export const showGameOver = async (score: number, moves: number, resetCb: () => 
     leaderboardElement.refresh()
     leaderboardElement.editableId = runId
 
-    leaderboardElement.addEventListener("update:name", (e) => {
-        updateScoreProfile({ id: runId, name: e.detail })
-        updateUserProfile({ name: e.detail })
+    leaderboardElement.addEventListener("update:name", (event) => {
+        updateScoreProfile({ id: runId, name: event.detail })
+        updateUserProfile({ name: event.detail })
     })
-    leaderboardElement.addEventListener("update:taunt", (e) => {
-        updateScoreProfile({ id: runId, taunt: e.detail })
-        updateUserProfile({ taunt: e.detail })
+    leaderboardElement.addEventListener("update:taunt", (event) => {
+        updateScoreProfile({ id: runId, taunt: event.detail })
+        updateUserProfile({ taunt: event.detail })
     })
 }

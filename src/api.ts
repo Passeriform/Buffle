@@ -1,4 +1,4 @@
-import { GameType } from "./constants"
+import type { GameType } from "./constants"
 import { initSession } from "./auth/session"
 
 export type LeaderboardData = {
@@ -27,14 +27,14 @@ export const loadScores = async (gameType: GameType) => {
         })
 
         if (!response.ok) {
-            throw Error(`Data couldn't be loaded: ${response.statusText}`)
+            throw new Error(`Data couldn't be loaded: ${response.statusText}`)
         }
 
         const result = await response.json() as LeaderboardData[]
 
         return result
     } catch (err) {
-        throw Error(`Data couldn't be loaded: ${err}`)
+        throw new Error(`Data couldn't be loaded: ${err}`)
     }
 }
 
@@ -53,21 +53,21 @@ export const submitScore = async (payload: SubmitScorePayload) => {
         const response = await fetch(import.meta.env.VITE_LEADERBOARD_SUBMIT_API, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${session.access_token}`,
-                "Content-Type": "application/json"
+                Authorization: `Bearer ${session.access_token}`,
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(payload),
         })
 
         if (!response.ok) {
-            throw Error(`Failed to publish high score: ${response.statusText}`)
+            throw new Error(`Failed to publish high score: ${response.statusText}`)
         }
 
         const { runId } = await response.json() as { runId: number }
 
         return runId
     } catch (err) {
-        throw Error(`Failed to publish high score: ${err}`)
+        throw new Error(`Failed to publish high score: ${err}`)
     }
 }
 
@@ -84,20 +84,20 @@ export const updateScoreProfile = async (payload: UpdateScoreProfilePayload) => 
         const response = await fetch(import.meta.env.VITE_LEADERBOARD_SUBMIT_API, {
             method: "PUT",
             headers: {
-                "Authorization": `Bearer ${session.access_token}`,
-                "Content-Type": "application/json"
+                Authorization: `Bearer ${session.access_token}`,
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(payload),
         })
 
         if (!response.ok) {
-            throw Error(`Failed to publish high score: ${response.statusText}`)
+            throw new Error(`Failed to publish high score: ${response.statusText}`)
         }
 
         const { runId } = await response.json() as { runId: number }
 
         return runId
     } catch (err) {
-        throw Error(`Failed to publish high score: ${err}`)
+        throw new Error(`Failed to publish high score: ${err}`)
     }
 }

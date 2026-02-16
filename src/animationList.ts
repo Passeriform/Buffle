@@ -1,7 +1,7 @@
-import { Block, BlockValue } from "./gui/block"
-import { Animation, Tween } from "./animation"
-import { mergeRGBChannels, parseColorHex, splitRGBChannels, toColorHex } from "./utility/color"
 import type { Layout } from "./utility/layout"
+import { Animation, type Tween } from "./animation"
+import { Block, BlockValue } from "./gui/block"
+import { mergeRGBChannels, parseColorHex, splitRGBChannels, toColorHex } from "./utility/color"
 
 type BlockMoveMetadata = { targetIndex: number }
 
@@ -42,7 +42,7 @@ export class BlockUpgradeAnimation extends Animation<Block> {
         const { red, green, blue } = this.interpolate(
             { red: rb, green: gb, blue: bb },
             { red: ra, green: ga, blue: ba },
-            delta
+            delta,
         )
         const color = mergeRGBChannels(red, green, blue)
 

@@ -8,7 +8,7 @@ const sortOrderMapping = {
     [Direction.RIGHT]: SortOrder.ROW_REVERSE,
 } as const
 
-export type Move = [number, number]
+export type Move = [from: number, to: number]
 
 const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Direction) => {
     // TODO: Simplify this switch
@@ -21,7 +21,7 @@ const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Directi
             if (track !== index) {
                 state.updateKey(index, track)
             }
-            return [index !== track, [index, track]] as [boolean, Move]
+            return [index !== track, [index, track]] as [canMove: boolean, move: Move]
         }
         case Direction.DOWN: {
             let track = index
@@ -31,7 +31,7 @@ const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Directi
             if (track !== index) {
                 state.updateKey(index, track)
             }
-            return [index !== track, [index, track]] as [boolean, Move]
+            return [index !== track, [index, track]] as [canMove: boolean, move: Move]
         }
         case Direction.LEFT: {
             let track = index
@@ -41,7 +41,7 @@ const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Directi
             if (track !== index) {
                 state.updateKey(index, track)
             }
-            return [index !== track, [index, track]] as [boolean, Move]
+            return [index !== track, [index, track]] as [canMove: boolean, move: Move]
         }
         case Direction.RIGHT: {
             let track = index
@@ -51,7 +51,7 @@ const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Directi
             if (track !== index) {
                 state.updateKey(index, track)
             }
-            return [index !== track, [index, track]] as [boolean, Move]
+            return [index !== track, [index, track]] as [canMove: boolean, move: Move]
         }
     }
 }

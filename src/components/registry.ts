@@ -28,8 +28,13 @@ type CustomElementTagMap = {
 type CustomElementEventMap =
     & GameOverElement.EVENTS
     & LeaderboardElement.EVENTS
+    & PopoverElement.EVENTS
+
+/* eslint-disable ts/consistent-type-definitions -- Extending global HTML attributes requires interface for declaration merging */
 
 declare global {
     interface HTMLElementTagNameMap extends CustomElementTagMap { }
     interface HTMLElementEventMap extends CustomElementEventMap { }
 }
+
+/* eslint-enable ts/consistent-type-definitions */

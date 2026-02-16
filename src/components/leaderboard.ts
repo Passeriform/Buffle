@@ -1,9 +1,10 @@
-import rawHtml from "./leaderboard.html?raw"
-import rawStyleSheet from "./leaderboard.css?raw"
-import { parseTemplate, parseStyleSheet } from "../utility/dom"
-import { loadScores, type LeaderboardData } from "../api"
 import type { GameType } from "../constants"
+import { type LeaderboardData, loadScores } from "../api"
+import { parseStyleSheet, parseTemplate } from "../utility/dom"
+import rawStyleSheet from "./leaderboard.css?raw"
+import rawHtml from "./leaderboard.html?raw"
 
+/* eslint-disable-next-line ts/no-namespace -- Events declaration is dynamically picked for registration. */
 export declare namespace LeaderboardElement {
     export type EVENTS = {
         "update:name": CustomEvent<string>
@@ -45,10 +46,10 @@ export class LeaderboardElement extends HTMLElement {
         input.addEventListener("focus", () => {
             input.select()
         })
-        input.addEventListener("keydown", (e) => {
-            e.stopPropagation()
+        input.addEventListener("keydown", (event) => {
+            event.stopPropagation()
 
-            if (e.key === "Enter") {
+            if (event.key === "Enter") {
                 input.blur()
             }
         })
@@ -87,8 +88,8 @@ export class LeaderboardElement extends HTMLElement {
                 const popover = row.querySelector("buffle-popover")!
 
                 nameInput.addEventListener("focus", () => popover.show())
-                nameInput.addEventListener("blur", (e) => {
-                    if (e.relatedTarget !== tauntInput) {
+                nameInput.addEventListener("blur", (event) => {
+                    if (event.relatedTarget !== tauntInput) {
                         popover.hide()
                     }
                 })
@@ -111,6 +112,7 @@ export class LeaderboardElement extends HTMLElement {
         this.#renderData()
     }
 
+    /* eslint-disable-next-line accessor-pairs -- Property should only be set programmatically */
     set editableId(value: number | undefined) {
         this.#editableId = value
     }

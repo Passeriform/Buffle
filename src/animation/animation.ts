@@ -1,7 +1,7 @@
 import type { AnyWidget } from "../gui/widget"
-import { Easing, type EasingMethod } from "./easing"
-import { Signal } from "./signal"
+import type { Easing, EasingMethod } from "./easing"
 import type { Tween } from "./tween"
+import { Signal } from "./signal"
 
 export type TweenOptions = {
     duration: number

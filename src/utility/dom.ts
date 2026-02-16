@@ -4,7 +4,7 @@ export const parseTemplate = (rawHtml: string) => {
     const template = doc.querySelector("template")
 
     if (!template || !(template instanceof HTMLTemplateElement)) {
-        throw Error("Invalid template found. The root of the component must have a single <template> element.")
+        throw new Error("Invalid template found. The root of the component must have a single <template> element.")
     }
 
     return template as HTMLTemplateElement

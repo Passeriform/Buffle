@@ -14,7 +14,7 @@ type TextWidgetState = string
 export class Text extends Widget<TextOptions, TextWidgetState> {
     constructor(options: Partial<TextOptions> = {}) {
         super({
-            color: "#F3EDEB",
+            color: "#f3edeb",
             font: "Quicksand, sans-serif",
             align: "center",
             baseline: "middle",

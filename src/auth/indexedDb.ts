@@ -15,7 +15,6 @@ export const initDB = async (name: string, storeName: string) => {
 
         request.onsuccess = () => resolve(request.result)
         request.onerror = () => reject(request.error)
-
     })
 
     const db = await openDB()

@@ -1,11 +1,11 @@
-import { UnionSet } from "../utility/unionSet"
 import type { DirectionalMatch } from "./directionalMatcher"
+import { UnionSet } from "../utility/unionSet"
 
 export type SpecialMatchType = "L" | "T" | "+" | "F" | "U" | "A" | "O" | "Q" | "B"
 
 export type SpecialMatch = {
-    type: SpecialMatchType,
-    matchGroups: DirectionalMatch[][],
+    type: SpecialMatchType
+    matchGroups: DirectionalMatch[][]
 }
 
 const getJunctions = (matches: DirectionalMatch[]) => {

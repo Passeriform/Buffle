@@ -4,20 +4,20 @@ export class SparseMatrix<V> {
     private map = new Map<number, V>()
     private dirty = false
     private keys: number[] = []
-    public readonly shape: [number, number]
+    public readonly shape: [rows: number, columns: number]
 
     private comparator(order: SortOrder) {
-        return (a: number, b: number) => {
-            const aRow = Math.floor(a / this.shape[1])
-            const aCol = a % this.shape[1]
-            const bRow = Math.floor(b / this.shape[1])
-            const bCol = b % this.shape[1]
+        return (first: number, second: number) => {
+            const firstRow = Math.floor(first / this.shape[1])
+            const firstColumn = first % this.shape[1]
+            const secondRow = Math.floor(second / this.shape[1])
+            const secondColumn = second % this.shape[1]
 
             switch (order) {
-                case SortOrder.ROW: return aRow - bRow || aCol - bCol
-                case SortOrder.ROW_REVERSE: return aRow - bRow || bCol - aCol
-                case SortOrder.COLUMN: return aCol - bCol || aRow - bRow
-                case SortOrder.COLUMN_REVERSE: return aCol - bCol || bRow - aRow
+                case SortOrder.ROW: return firstRow - secondRow || firstColumn - secondColumn
+                case SortOrder.ROW_REVERSE: return firstRow - secondRow || secondColumn - firstColumn
+                case SortOrder.COLUMN: return firstColumn - secondColumn || firstRow - secondRow
+                case SortOrder.COLUMN_REVERSE: return firstColumn - secondColumn || secondRow - firstRow
             }
         }
     }
@@ -28,20 +28,20 @@ export class SparseMatrix<V> {
             this.dirty = false
         }
 
-        const entries: [number, V][] = []
+        const entries: [index: number, element: V][] = []
 
-        this.keys.forEach((k) => {
-            const value = this.map.get(k)
+        this.keys.forEach((key) => {
+            const value = this.map.get(key)
 
             if (value !== undefined) {
-                entries.push([k, value])
+                entries.push([key, value])
             }
         })
 
         return entries[Symbol.iterator]()
     }
 
-    constructor(iterable: Iterable<readonly [number, V]>, shape: [number, number]) {
+    constructor(iterable: Iterable<readonly [number, V]>, shape: [rows: number, columns: number]) {
         this.map = new Map(iterable)
         this.keys = [...this.map.keys()]
         this.shape = shape
@@ -73,7 +73,7 @@ export class SparseMatrix<V> {
 
     set(key: number, value: V) {
         if (key < 0 && key >= this.maxSize) {
-            throw Error("Attempted to insert a larger value than the matrix can hold")
+            throw new Error("Attempted to insert a larger value than the matrix can hold")
         }
 
         if (!this.map.has(key)) {
@@ -93,7 +93,7 @@ export class SparseMatrix<V> {
             return false
         }
 
-        this.keys = this.keys.filter((k) => k !== key)
+        this.keys = this.keys.filter((current) => current !== key)
 
         return true
     }
@@ -110,7 +110,7 @@ export class SparseMatrix<V> {
         const value = this.get(key)
 
         if (!value) {
-            throw Error("Attempted to update a key that doesn't exist")
+            throw new Error("Attempted to update a key that doesn't exist")
         }
 
         this.delete(key)
@@ -142,12 +142,10 @@ export class SparseMatrix<V> {
             this.dirty = false
         }
 
-        const sortingKeys = [...this.keys].sort(
-            this.comparator(sortOrder)
-        )
+        const sortingKeys = [...this.keys].sort(this.comparator(sortOrder))
 
-        sortingKeys.forEach((k) => {
-            fn(this.map.get(k)!, k)
+        sortingKeys.forEach((key) => {
+            fn(this.map.get(key)!, key)
         })
     }
 
@@ -163,12 +161,10 @@ export class SparseMatrix<V> {
             this.dirty = false
         }
 
-        const sortingKeys = [...this.keys].sort(
-            this.comparator(sortOrder)
-        )
+        const sortingKeys = [...this.keys].sort(this.comparator(sortOrder))
 
-        sortingKeys.forEach((k) => {
-            acc = fn(acc, this.map.get(k)!, k)
+        sortingKeys.forEach((key) => {
+            acc = fn(acc, this.map.get(key)!, key)
         })
 
         return acc

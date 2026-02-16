@@ -1,9 +1,9 @@
-import { padLayout, type Layout } from "../utility/layout"
+import { type Layout, padLayout } from "../utility/layout"
 import { Widget, type WidgetOptions } from "./widget"
 
 type GridOptions = WidgetOptions & {
     background: string
-    dimensions: [number, number]
+    dimensions: [rows: number, columns: number]
     rounding: number
     gap: number
 }
@@ -13,7 +13,7 @@ type GridOptions = WidgetOptions & {
 export class Grid extends Widget<GridOptions, never, "1**"> {
     constructor(options: Partial<GridOptions> = {}) {
         super({
-            background: "#5A2F28",
+            background: "#5a2f28",
             dimensions: [4, 4],
             gap: 0,
             rounding: 0,
@@ -54,7 +54,7 @@ export class Grid extends Widget<GridOptions, never, "1**"> {
                 layout.top,
                 layout.width,
                 layout.height,
-                this.options.rounding
+                this.options.rounding,
             )
         })
         ctx.fill()

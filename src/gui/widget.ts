@@ -11,18 +11,18 @@ type RenderChain = `${"1" | "*"}${"1" | "*"}${"1" | "*"}`
 
 type PickRenderType<
     RC extends RenderChain,
-    Type extends "In" | "Render" | "Slot"
+    Type extends "In" | "Render" | "Slot",
 > =
     RC extends `${infer I}${infer R}${infer S}`
-    ? Type extends "In" ? I
-    : Type extends "Render" ? R
-    : Type extends "Slot" ? S
-    : never
-    : never
+        ? Type extends "In" ? I
+            : Type extends "Render" ? R
+                : Type extends "Slot" ? S
+                    : never
+        : never
 
 type ResolveLayout<
     RC extends RenderChain,
-    Type extends "In" | "Render" | "Slot"
+    Type extends "In" | "Render" | "Slot",
 > =
     PickRenderType<RC, Type> extends "1" ? Layout : PickRenderType<RC, Type> extends "*" ? Layout[] : never
 
@@ -30,6 +30,7 @@ type InLayout<T extends RenderChain> = ResolveLayout<T, "In">
 type RenderLayout<T extends RenderChain> = ResolveLayout<T, "Render">
 type SlotLayout<T extends RenderChain> = ResolveLayout<T, "Slot">
 
+// TODO: Make every widget pre-render in separate canvas context
 export abstract class Widget<
     Options extends WidgetOptions = WidgetOptions,
     State = never,

@@ -5,8 +5,8 @@ import { extractSpecialMatches } from "../src/matcher/specialMatcher"
 import { SparseMatrix } from "../src/utility/sparseMatrix"
 import {
     BOUNDARY_CHECK_SHAPES,
-    SHAPE_DIRECTIONAL_MATCH_TEST_CASES,
     GRID_DIMENSION,
+    SHAPE_DIRECTIONAL_MATCH_TEST_CASES,
     SHAPES,
 } from "./dataset"
 import { makeSparseMatrixIterator, match3Filter } from "./utility"

@@ -2,8 +2,8 @@ import { Direction } from "../constants"
 import { SortOrder, type SparseMatrix } from "../utility/sparseMatrix"
 
 export type DirectionalMatch = {
-    direction: Direction,
-    indices: number[],
+    direction: Direction
+    indices: number[]
 }
 
 const getOrderMapping = (direction: Direction) => {

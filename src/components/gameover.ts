@@ -1,10 +1,11 @@
-import rawTemplate from "./gameover.html?raw"
+import { parseStyleSheet, parseTemplate } from "../utility/dom"
 import rawStyleSheet from "./gameover.css?raw"
-import { parseTemplate, parseStyleSheet } from "../utility/dom"
+import rawTemplate from "./gameover.html?raw"
 
+/* eslint-disable-next-line ts/no-namespace -- Events declaration is dynamically picked for registration. */
 export declare namespace GameOverElement {
     export type EVENTS = {
-        "restart": CustomEvent<never>
+        restart: CustomEvent<never>
     }
 }
 
@@ -31,12 +32,12 @@ export class GameOverElement extends HTMLElement {
     #loadRestartKeys() {
         this.#restartKeys = new Set((this.getAttribute("restart-key") ?? GameOverElement.DEFAULT_RESTART_KEY)
             .split(",")
-            .map(k => k.trim().toLocaleLowerCase())
+            .map((key) => key.trim().toLocaleLowerCase())
             .filter(Boolean))
     }
 
-    #onKeyDown = (e: KeyboardEvent) => {
-        if (this.#restartKeys.has(e.key.toLocaleLowerCase())) {
+    #onKeyDown = (event: KeyboardEvent) => {
+        if (this.#restartKeys.has(event.key.toLocaleLowerCase())) {
             this.#emitRestart()
         }
     }
@@ -69,10 +70,12 @@ export class GameOverElement extends HTMLElement {
         this.#loadRestartKeys()
     }
 
+    /* eslint-disable-next-line accessor-pairs -- Property should only be set programmatically */
     set score(value: number) {
         this.#root.querySelector("[data-score]")!.textContent = String(value)
     }
 
+    /* eslint-disable-next-line accessor-pairs -- Property should only be set programmatically */
     set moves(value: number) {
         this.#root.querySelector("[data-moves]")!.textContent = String(value)
     }

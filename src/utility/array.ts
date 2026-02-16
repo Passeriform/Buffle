@@ -1,12 +1,14 @@
-
 declare global {
+    /* eslint-disable-next-line ts/consistent-type-definitions -- Extending Array requires interface for declaration merging */
     interface Array<T> {
-        partition(this: T[], predicate: (item: T) => boolean): [Array<T>, Array<T>]
-        sum(this: T extends number ? T[] : never): number
-        max(this: T extends number ? T[] : never): number
-        reduceSequence<U>(this: T[], callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => Promise<U>, initialValue: U): Promise<U>
+        partition: (this: T[], predicate: (item: T) => boolean) => [matched: Array<T>, unmatched: Array<T>]
+        sum: (this: T extends number ? T[] : never) => number
+        max: (this: T extends number ? T[] : never) => number
+        reduceSequence: <U>(this: T[], callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => Promise<U>, initialValue: U) => Promise<U>
     }
 }
+
+/* eslint-disable no-extend-native -- Prototype utilities give better semantics in case of arrays */
 
 Array.prototype.partition = function<T>(this: T[], predicate: (item: T) => boolean) {
     const satisfied: T[] = []
@@ -37,3 +39,5 @@ Array.prototype.reduceSequence = function<T, U>(this: T[], callbackfn: (previous
         return callbackfn(previousValue, ...others)
     }, Promise.resolve(initialValue))
 }
+
+/* eslint-enable no-extend-native */

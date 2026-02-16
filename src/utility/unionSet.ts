@@ -12,30 +12,33 @@ export class UnionSet {
     }
 
     find(index: number): number {
-        const p = this.parent.get(index)!
-        if (p !== index) {
-            const root = this.find(p)
+        const parent = this.parent.get(index)!
+        if (parent !== index) {
+            const root = this.find(parent)
             this.parent.set(index, root)
             return root
         }
         return index
     }
 
-    union(a: number, b: number) {
-        const aSet = this.find(a)
-        const bSet = this.find(b)
-        if (aSet === bSet) return
+    union(thisElement: number, otherElement: number) {
+        const thisSet = this.find(thisElement)
+        const otherSet = this.find(otherElement)
 
-        const rankA = this.rank.get(aSet)!
-        const rankB = this.rank.get(bSet)!
+        if (thisSet === otherSet) {
+            return
+        }
 
-        if (rankA < rankB) {
-            this.parent.set(aSet, bSet)
-        } else if (rankA > rankB) {
-            this.parent.set(bSet, aSet)
+        const thisRank = this.rank.get(thisSet)!
+        const otherRank = this.rank.get(otherSet)!
+
+        if (thisRank < otherRank) {
+            this.parent.set(thisSet, otherSet)
+        } else if (thisRank > otherRank) {
+            this.parent.set(otherSet, thisSet)
         } else {
-            this.parent.set(bSet, aSet)
-            this.rank.set(aSet, rankA + 1)
+            this.parent.set(otherSet, thisSet)
+            this.rank.set(thisSet, thisRank + 1)
         }
     }
 }
