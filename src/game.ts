@@ -185,6 +185,9 @@ export const update = async (direction: Direction) => {
 
     await spawn()
 
+    // Eager check for creating matches on spawn
+    await merge(direction)
+
     // TODO: Check another round for merges after spawning a new block
 
     // Check for game over
