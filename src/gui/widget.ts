@@ -1,10 +1,9 @@
 import type { Layout } from "../utility/layout"
 
 export type WidgetOptions = {
-    margin: number
     // TODO: Add inherit to take up parent's opacity
     opacity: number
-    padding: number
+    padding: `${number}%`
 }
 
 type RenderChain = `${"1" | "*"}${"1" | "*"}${"1" | "*"}`
@@ -48,13 +47,16 @@ export abstract class Widget<
         })
     }
 
+    protected resolveDependent(value: `${number}%`, layout: Layout) {
+        return Number.parseFloat(value) * layout.width / 100
+    }
+
     constructor(options: Partial<Options> = {}) {
         this.baseOptions = {
-            margin: 0,
             opacity: 1,
-            padding: 0,
+            padding: "0%",
             ...options,
-        } as Options
+        } as unknown as Options
     }
 
     get options(): Readonly<Options> {

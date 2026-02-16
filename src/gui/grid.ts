@@ -4,8 +4,8 @@ import { Widget, type WidgetOptions } from "./widget"
 type GridOptions = WidgetOptions & {
     background: string
     dimensions: [rows: number, columns: number]
-    rounding: number
-    gap: number
+    rounding: `${number}%`
+    gap: `${number}%`
 }
 
 // TODO: Fix responsive screen issues
@@ -15,8 +15,8 @@ export class Grid extends Widget<GridOptions, never, "1**"> {
         super({
             background: "#5a2f28",
             dimensions: [4, 4],
-            gap: 0,
-            rounding: 0,
+            gap: "0%",
+            rounding: "0%",
             ...options,
         })
     }
@@ -26,22 +26,18 @@ export class Grid extends Widget<GridOptions, never, "1**"> {
     }
 
     override getRenderLayouts(inLayout: Layout) {
-        const holeWidth = (inLayout.width - (this.options.dimensions[1] + 1) * this.options.gap) / this.options.dimensions[1]
-        const holeHeight = (inLayout.height - (this.options.dimensions[0] + 1) * this.options.gap) / this.options.dimensions[0]
+        const layoutGrid = Array.from({ length: this.options.dimensions[0] }).flatMap(
+            (_, rowIdx) => Array.from({ length: this.options.dimensions[1] }).map(
+                (_, colIdx) => ({
+                    left: inLayout.left + (colIdx * inLayout.width / this.options.dimensions[1]),
+                    top: inLayout.top + (rowIdx * inLayout.height / this.options.dimensions[0]),
+                    width: inLayout.width / this.options.dimensions[1],
+                    height: inLayout.height / this.options.dimensions[0],
+                }),
+            ),
+        ).map((layout) => padLayout(layout, this.resolveDependent(this.options.gap, layout)))
 
-        const layouts = []
-        for (let row = 0; row < this.options.dimensions[0]; ++row) {
-            for (let col = 0; col < this.options.dimensions[1]; ++col) {
-                layouts.push({
-                    left: inLayout.left + (col + 1) * this.options.gap + col * holeWidth,
-                    top: inLayout.top + (row + 1) * this.options.gap + row * holeHeight,
-                    width: holeWidth,
-                    height: holeHeight,
-                })
-            }
-        }
-
-        return layouts
+        return layoutGrid
     }
 
     override draw(ctx: CanvasRenderingContext2D, layouts: Layout[]) {
@@ -54,13 +50,13 @@ export class Grid extends Widget<GridOptions, never, "1**"> {
                 layout.top,
                 layout.width,
                 layout.height,
-                this.options.rounding,
+                this.resolveDependent(this.options.rounding, layout),
             )
         })
         ctx.fill()
     }
 
     override getSlots(layouts: Layout[]) {
-        return layouts.map((layout) => padLayout(layout, this.options.padding))
+        return layouts.map((layout) => padLayout(layout, this.resolveDependent(this.options.padding, layout)))
     }
 }
