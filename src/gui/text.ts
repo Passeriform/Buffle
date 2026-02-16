@@ -27,7 +27,7 @@ export class Text extends Widget<TextOptions, TextWidgetState> {
     }
 
     override getRenderLayouts(inLayout: Layout) {
-        const base = Math.min(inLayout.width, inLayout.height) - this.options.margin
+        const base = Math.min(inLayout.width, inLayout.height)
         const [xCenter, yCenter] = [
             inLayout.left + (inLayout.width / 2),
             inLayout.top + (inLayout.height / 2),

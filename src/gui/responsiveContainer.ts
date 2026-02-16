@@ -3,18 +3,16 @@ import { Widget, type WidgetOptions } from "./widget"
 
 type ResponsiveContainerOptions = WidgetOptions & {
     background: string
-    max: number
-    min: number
-    rounding: number
+    max?: number
+    min?: number
+    rounding: `${number}%`
 }
 
 export class ResponsiveContainer extends Widget<ResponsiveContainerOptions> {
     constructor(options: Partial<ResponsiveContainerOptions> = {}) {
         super({
             background: "#6b3c3300",
-            max: 1600,
-            min: 400,
-            rounding: 0,
+            rounding: "0%",
             ...options,
         })
     }
@@ -24,9 +22,9 @@ export class ResponsiveContainer extends Widget<ResponsiveContainerOptions> {
     }
 
     override getRenderLayouts(inLayout: Layout) {
-        const base = Math.min(inLayout.width, inLayout.height) - this.options.margin
-        const minClamped = this.options.min ? Math.max(this.options.min, base) : base
-        const maxClamped = this.options.max ? Math.min(this.options.max, minClamped) : minClamped
+        const base = Math.min(inLayout.width, inLayout.height)
+        const minClamped = Math.max(this.options.min ?? base, base)
+        const maxClamped = Math.min(this.options.max ?? minClamped, minClamped)
         const [xCenter, yCenter] = [
             inLayout.left + (inLayout.width / 2),
             inLayout.top + (inLayout.height / 2),
@@ -49,12 +47,12 @@ export class ResponsiveContainer extends Widget<ResponsiveContainerOptions> {
             layout.top,
             layout.width,
             layout.height,
-            this.options.rounding,
+            Math.max(0, this.resolveDependent(this.options.rounding, layout)),
         )
         ctx.fill()
     }
 
     override getSlots(layout: Layout) {
-        return padLayout(layout, this.options.padding)
+        return padLayout(layout, this.resolveDependent(this.options.padding, layout))
     }
 }

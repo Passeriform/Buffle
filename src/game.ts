@@ -29,27 +29,24 @@ const blockMap = new SparseMatrix<Block>([], gridDimensions)
 const animationManager: AnimationManager = new AnimationManager()
 
 // GUI components
-const scoreText = new Text({
-    margin: 20,
-})
+const scoreText = new Text()
 const board = new ResponsiveContainer({
     background: "#6b3c33",
-    margin: 100,
-    padding: 10,
-    rounding: 20,
+    padding: "2%",
+    rounding: "2%",
+    min: 50,
 })
 const grid = new Grid({
-    gap: 20,
-    rounding: 20,
+    gap: "4.5%",
+    rounding: "10%",
     dimensions: gridDimensions,
 })
 const block = new Block(BlockValue.TWO, {
-    padding: 20,
-    rounding: 20,
+    padding: "15%",
+    rounding: "10%",
 })
 // TODO: Move inside block widget
 const blockValueText = new Text({
-    margin: 20,
     color: "#6a4537",
 })
 
@@ -207,7 +204,7 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
     const root = padLayout(rootLayout(ctx.canvas), 50)
     const [scoreSlot, boardSlot] = splitVertical(root, root.height / 8)
     scoreText.render(ctx, scoreSlot, `Score: ${totalScore}`)
-    const gridSlot = board.render(ctx, boardSlot)
+    const gridSlot = board.render(ctx, padLayout(boardSlot, 50))
     const blockSlots = grid.render(ctx, gridSlot)
     blockMap.forEach((block, index) => {
         if (!block) {

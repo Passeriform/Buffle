@@ -28,7 +28,7 @@ export namespace BlockValue {
 }
 
 type BlockOptions = WidgetOptions & {
-    rounding: number
+    rounding: `${number}%`
 }
 
 // TODO: Give bevel 3d look to block
@@ -60,7 +60,7 @@ export class Block extends Widget<BlockOptions & { background: string }> {
         }
 
         super({
-            rounding: 0,
+            rounding: "0%",
             ...options,
         })
 
@@ -85,13 +85,13 @@ export class Block extends Widget<BlockOptions & { background: string }> {
             layout.top,
             layout.width,
             layout.height,
-            this.options.rounding,
+            this.resolveDependent(this.options.rounding, layout),
         )
         ctx.fill()
     }
 
     override getSlots(layout: Layout) {
-        return padLayout(layout, this.options.padding)
+        return padLayout(layout, this.resolveDependent(this.options.padding, layout))
     }
 
     get value(): Readonly<BlockValue> {
