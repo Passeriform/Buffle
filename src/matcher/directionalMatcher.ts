@@ -53,7 +53,7 @@ export const getSecondaryDirection = (state: SparseMatrix<unknown>, direction: D
 export const getDirectionalMatches = <T>(
     state: SparseMatrix<T>,
     direction: Direction,
-    equalFn: (a: T, b: T) => boolean,
+    equalFn: (first: T, second: T) => boolean = (first, second) => first === second,
 ) => {
     const isContiguous = (collection: DirectionalMatch[], value: T, index: number) => {
         const last = collection.at(-1)
@@ -68,7 +68,7 @@ export const getDirectionalMatches = <T>(
             return false
         }
 
-        if (isWrapped(direction, index, lastIndex, state.shape[1])) {
+        if (isWrapped(direction, lastIndex, index, state.shape[1])) {
             return false
         }
 
