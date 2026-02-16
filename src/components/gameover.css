@@ -26,10 +26,10 @@
     min-width: 25rem;
     align-items: center;
     justify-content: center;
-    border: 0.5rem solid #6B3C33;
+    border: 0.5rem solid #6b3c33;
     border-radius: 1rem;
     background-color: #271612;
-    box-shadow: 0 0 1.2rem 0.5rem #1F1412;
+    box-shadow: 0 0 1.2rem 0.5rem #1f1412;
     z-index: 1;
 }
 
@@ -52,7 +52,7 @@
     justify-content: center;
     align-items: center;
     border-radius: 0.5rem;
-    background-color: #6B3C33;
+    background-color: #6b3c33;
 }
 
 :host > .splash > .stats > .block > .heading {
@@ -66,7 +66,7 @@
     align-items: center;
     margin-bottom: 0.5rem;
     border-radius: 0.5rem;
-    background-color: #FF9B84;
+    background-color: #ff9b84;
 }
 
 :host > .splash > .action {

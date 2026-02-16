@@ -10,7 +10,7 @@ export class ProcessQueue<T = unknown> {
 
     addTask(...tasks: Task<T>[]) {
         if (this.cancelled) {
-            throw Error("A task cannot be added on a cancelled queue.")
+            throw new Error("A task cannot be added on a cancelled queue.")
         }
 
         this.queue.push(...tasks)

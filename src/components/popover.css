@@ -9,7 +9,7 @@
     display: block;
     position: absolute;
     border-radius: 0.8rem;
-    background-color: #FF9B84;
+    background-color: #ff9b84;
     z-index: 1000;
     mask-repeat: no-repeat;
 }
@@ -18,6 +18,7 @@
     display: none;
 }
 
-:host(:focus-within), :host([child-hover]) {
-    background-color: #6B3C33;
+:host(:focus-within),
+:host([child-hover]) {
+    background-color: #6b3c33;
 }

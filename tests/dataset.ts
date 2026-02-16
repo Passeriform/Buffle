@@ -4,6 +4,8 @@ import { parse } from "./utility"
 
 export const GRID_DIMENSION = [4, 4] as [rows: number, columns: number]
 
+/* eslint-disable id-length -- Disabling pedantic rule as data is only used for testing */
+
 export const SHAPES = {
     L: parse(GRID_DIMENSION[0])`
 #
@@ -73,6 +75,7 @@ export const SHAPES = {
 `,
 } as const satisfies Partial<Record<SpecialMatchType | `${SpecialMatchType}_ALT`, number[]>>
 
+/* eslint-enable id-length */
 
 export const BOUNDARY_CHECK_SHAPES = {
     ROW: parse(GRID_DIMENSION[0])`

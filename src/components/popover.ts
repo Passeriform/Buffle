@@ -1,9 +1,10 @@
-import rawHtml from "./popover.html?raw"
+import { parseStyleSheet, parseTemplate } from "../utility/dom"
 import rawStyleSheet from "./popover.css?raw"
-import { parseTemplate, parseStyleSheet } from "../utility/dom"
+import rawHtml from "./popover.html?raw"
 
+/* eslint-disable-next-line ts/no-namespace -- Events declaration is dynamically picked for registration. */
 export declare namespace PopoverElement {
-    export type EVENTS = {}
+    export type EVENTS = Record<string, never>
 }
 
 export class PopoverElement extends HTMLElement {
@@ -48,14 +49,13 @@ export class PopoverElement extends HTMLElement {
             }
         }
 
-
         this.#recomputePosition()
     }
 
     #recomputePadding() {
         const styles = getComputedStyle(this)
 
-        const tailSize = parseFloat(styles.getPropertyValue("--tail-size"))
+        const tailSize = Number.parseFloat(styles.getPropertyValue("--tail-size"))
 
         this.style.paddingBottom = `${tailSize}px`
     }
@@ -66,9 +66,9 @@ export class PopoverElement extends HTMLElement {
         const width = this.offsetWidth
         const height = this.offsetHeight
 
-        const radius = parseFloat(styles.borderRadius)
-        const tailSize = parseFloat(styles.getPropertyValue("--tail-size"))
-        const tailOffset = parseFloat(styles.getPropertyValue("--tail-offset"))
+        const radius = Number.parseFloat(styles.borderRadius)
+        const tailSize = Number.parseFloat(styles.getPropertyValue("--tail-size"))
+        const tailOffset = Number.parseFloat(styles.getPropertyValue("--tail-offset"))
 
         const curveHandleLength = Math.min(radius, height / 2, width / 2)
         const bodyHeight = height - tailSize
@@ -106,8 +106,8 @@ Z
 
         const styles = getComputedStyle(this)
 
-        const inlineOffset = parseFloat(styles.getPropertyValue("--inline-offset"))
-        const blockOffset = parseFloat(styles.getPropertyValue("--block-offset"))
+        const inlineOffset = Number.parseFloat(styles.getPropertyValue("--inline-offset"))
+        const blockOffset = Number.parseFloat(styles.getPropertyValue("--block-offset"))
 
         const left = anchorRect.left + inlineOffset + (anchorRect.width / 2)
         const top = anchorRect.top + blockOffset - this.offsetHeight

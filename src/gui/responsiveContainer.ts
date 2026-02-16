@@ -1,4 +1,4 @@
-import { padLayout, type Layout } from "../utility/layout"
+import { type Layout, padLayout } from "../utility/layout"
 import { Widget, type WidgetOptions } from "./widget"
 
 type ResponsiveContainerOptions = WidgetOptions & {
@@ -11,7 +11,7 @@ type ResponsiveContainerOptions = WidgetOptions & {
 export class ResponsiveContainer extends Widget<ResponsiveContainerOptions> {
     constructor(options: Partial<ResponsiveContainerOptions> = {}) {
         super({
-            background: "#6B3C3300",
+            background: "#6b3c3300",
             max: 1600,
             min: 400,
             rounding: 0,

@@ -33,7 +33,7 @@ const createAnonUser = async () => {
         })
 
         if (!response.ok) {
-            throw Error(`Anonymous authentication failed: ${response.statusText}`)
+            throw new Error(`Anonymous authentication failed: ${response.statusText}`)
         }
 
         const session = await response.json() as ClientSession
@@ -41,7 +41,7 @@ const createAnonUser = async () => {
 
         return session
     } catch (err) {
-        throw Error(`Anonymous authentication failed: ${err}`)
+        throw new Error(`Anonymous authentication failed: ${err}`)
     }
 }
 
@@ -59,7 +59,7 @@ const refreshSession = async (session: ClientSession) => {
         })
 
         if (!response.ok) {
-            throw Error(`Token refresh failed: ${response.statusText}`)
+            throw new Error(`Token refresh failed: ${response.statusText}`)
         }
 
         const refreshed = await response.json() as ClientSession
@@ -67,7 +67,7 @@ const refreshSession = async (session: ClientSession) => {
 
         return refreshed
     } catch (err) {
-        throw Error(`Token refresh failed: ${err}`)
+        throw new Error(`Token refresh failed: ${err}`)
     }
 }
 

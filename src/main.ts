@@ -1,14 +1,14 @@
+import { initSession } from "./auth/session"
 import { bindControls } from "./controls"
 import { draw, init, update } from "./game"
 import { createCanvas } from "./utility/canvas"
 import "./utility/array"
-import { initSession } from "./auth/session"
 
 document.addEventListener("DOMContentLoaded", async () => {
     await initSession()
 
     // TODO: Use double buffer and swap for image draw, reduce flicker
-    const ctx = createCanvas("root", "#2E1F1C")
+    const ctx = createCanvas("root", "#2e1f1c")
 
     init()
     bindControls(document.body, update)

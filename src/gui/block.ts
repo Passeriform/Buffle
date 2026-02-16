@@ -1,4 +1,4 @@
-import { padLayout, type Layout } from "../utility/layout"
+import { type Layout, padLayout } from "../utility/layout"
 import { Widget, type WidgetOptions } from "./widget"
 
 export enum BlockValue {
@@ -16,6 +16,7 @@ export enum BlockValue {
     FORTY_NINETY_SIX,
 }
 
+/* eslint-disable-next-line ts/no-namespace -- Adding methods to enum needs namespace based import merging */
 export namespace BlockValue {
     export const repr = (value: BlockValue): number => {
         return 2 ** (value + 1)
@@ -35,22 +36,22 @@ export class Block extends Widget<BlockOptions & { background: string }> {
     private _value: BlockValue
 
     public static readonly COLOR_MAPPING = {
-        [BlockValue.TWO]: "#FFD6CC",
-        [BlockValue.FOUR]: "#FFB8A8",
-        [BlockValue.EIGHT]: "#FF9B84",
-        [BlockValue.SIXTEEN]: "#FF7E5E",
-        [BlockValue.THIRTY_TWO]: "#F96342",
-        [BlockValue.SIXTY_FOUR]: "#E84C2A",
-        [BlockValue.ONE_TWENTY_EIGHT]: "#CC3E22",
-        [BlockValue.TWO_FIFTY_SIX]: "#A8321F",
+        [BlockValue.TWO]: "#ffd6cc",
+        [BlockValue.FOUR]: "#ffb8a8",
+        [BlockValue.EIGHT]: "#ff9b84",
+        [BlockValue.SIXTEEN]: "#ff7e5e",
+        [BlockValue.THIRTY_TWO]: "#f96342",
+        [BlockValue.SIXTY_FOUR]: "#e84c2a",
+        [BlockValue.ONE_TWENTY_EIGHT]: "#cc3e22",
+        [BlockValue.TWO_FIFTY_SIX]: "#a8321f",
         [BlockValue.FIVE_TWELVE]: "#832719",
-        [BlockValue.TEN_TWENTY_FOUR]: "#5E1D13",
-        [BlockValue.TWENTY_FORTY_EIGHT]: "#3D120B",
-        [BlockValue.FORTY_NINETY_SIX]: "#240A06",
+        [BlockValue.TEN_TWENTY_FOUR]: "#5e1d13",
+        [BlockValue.TWENTY_FORTY_EIGHT]: "#3d120b",
+        [BlockValue.FORTY_NINETY_SIX]: "#240a06",
     } satisfies Record<BlockValue, string>
 
-    static equals(a: Block, b: Block) {
-        return a._value === b._value
+    static equals(first: Block, second: Block) {
+        return first._value === second._value
     }
 
     constructor(value: BlockValue, options: Partial<BlockOptions> = {}) {
@@ -60,7 +61,7 @@ export class Block extends Widget<BlockOptions & { background: string }> {
 
         super({
             rounding: 0,
-            ...options
+            ...options,
         })
 
         this._value = value

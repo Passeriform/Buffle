@@ -29,7 +29,7 @@ export const splitVertical = (layout: Layout, ...heights: number[]) => {
 
     for (const height of heights) {
         if (remaining < height) {
-            throw Error("Layout is not big enough for splitting.")
+            throw new Error("Layout is not big enough for splitting.")
         }
 
         layouts.push({ ...layout, top: layout.top + consumed, height })
@@ -52,7 +52,7 @@ export const splitHorizontal = (layout: Layout, ...widths: number[]) => {
 
     for (const width of widths) {
         if (remaining < width) {
-            throw Error("Layout is not big enough for splitting.")
+            throw new Error("Layout is not big enough for splitting.")
         }
 
         layouts.push({ ...layout, left: layout.left + consumed, width })
@@ -70,8 +70,8 @@ export const splitHorizontal = (layout: Layout, ...widths: number[]) => {
 export const wireframe = (ctx: CanvasRenderingContext2D, layout: Layout) => {
     const styleBackup = [ctx.fillStyle, ctx.strokeStyle] as const
 
-    ctx.fillStyle = "#DD4DAD20"
-    ctx.strokeStyle = "#DD4DADA0"
+    ctx.fillStyle = "#dd4dad20"
+    ctx.strokeStyle = "#dd4dada0"
 
     ctx.fillRect(layout.left, layout.top, layout.width, layout.height)
     ctx.strokeRect(layout.left, layout.top, layout.width, layout.height)

@@ -29,6 +29,7 @@ export class AnimationManager {
         return Promise.allSettled(animations.map((animation) => animation.completed.promise))
     }
 
+    // TODO: Rename to sideEffect
     onCompletion(animations: AnyAnimation[], callback: () => void) {
         this.wait(...animations).then(callback)
     }

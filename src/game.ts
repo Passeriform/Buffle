@@ -1,21 +1,21 @@
-import { Animation, AnimationManager, Easing, Tween } from "./animation"
+import type { Direction } from "./constants"
+import type { DirectionalMatch } from "./matcher/directionalMatcher"
+import { type Animation, AnimationManager, Easing, Tween } from "./animation"
 import { BlockMergeAnimation, BlockMoveAnimation, BlockSpawnAnimation, BlockUpgradeAnimation } from "./animationList"
+import { showGameOver } from "./finalize"
 import { Block, BlockValue } from "./gui/block"
-import { ResponsiveContainer } from "./gui/responsiveContainer"
 import { Grid } from "./gui/grid"
+import { ResponsiveContainer } from "./gui/responsiveContainer"
 import { Text } from "./gui/text"
 import { computeMatches } from "./matcher/matcher"
 import { computeMoves } from "./movement"
 import { computeNextBlockValue } from "./utility/difficulty"
 import { padLayout, rootLayout, splitVertical } from "./utility/layout"
 import { SparseMatrix } from "./utility/sparseMatrix"
-import type { DirectionalMatch } from "./matcher/directionalMatcher"
-import type { Direction } from "./constants"
-import { showGameOver } from "./finalize"
 
 // Config
 const gameSpeed = 1
-const gridDimensions = [4, 4] as [number, number]
+const gridDimensions = [4, 4] as [rows: number, columns: number]
 const moveTween = new Tween(200 / gameSpeed, Easing.EASE_IN_OUT)
 const mergeTween = new Tween(300 / gameSpeed, Easing.EASE_IN_OUT)
 const upgradeTween = new Tween(300 / gameSpeed, Easing.LINEAR)
@@ -33,7 +33,7 @@ const scoreText = new Text({
     margin: 20,
 })
 const board = new ResponsiveContainer({
-    background: "#6B3C33",
+    background: "#6b3c33",
     margin: 100,
     padding: 10,
     rounding: 20,
@@ -41,7 +41,7 @@ const board = new ResponsiveContainer({
 const grid = new Grid({
     gap: 20,
     rounding: 20,
-    dimensions: gridDimensions
+    dimensions: gridDimensions,
 })
 const block = new Block(BlockValue.TWO, {
     padding: 20,
@@ -50,7 +50,7 @@ const block = new Block(BlockValue.TWO, {
 // TODO: Move inside block widget
 const blockValueText = new Text({
     margin: 20,
-    color: "#6A4537",
+    color: "#6a4537",
 })
 
 // TODO: Implement web-worker event handler
@@ -136,6 +136,16 @@ const spawn = async () => {
     await animationManager.wait(new BlockSpawnAnimation(spawnBlock, spawnTween))
 }
 
+// Initializer
+export const init = () => {
+    // TODO: Add spawn animation for init
+    [8, 12, 13]
+        .forEach((index) => {
+            blockMap.set(index, block.clone())
+        })
+}
+
+// Reset handler
 const reset = () => {
     if (!gameOver) {
         return
@@ -148,15 +158,6 @@ const reset = () => {
     blockMap.clear()
 
     init()
-}
-
-// Initializer
-export const init = () => {
-    // TODO: Add spawn animation for init
-    [8, 12, 13]
-        .forEach((index) => {
-            blockMap.set(index, block.clone())
-        })
 }
 
 // TODO: Cancel an update if previous takes too long
@@ -210,7 +211,7 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
     const blockSlots = grid.render(ctx, gridSlot)
     blockMap.forEach((block, index) => {
         if (!block) {
-            throw Error(`Block undefined at index: ${index}`)
+            throw new Error(`Block undefined at index: ${index}`)
         }
 
         // Interpolate animations
@@ -223,7 +224,7 @@ export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) 
                 if (animation instanceof BlockMoveAnimation) {
                     animation.next(delta, {
                         from: blockSlots[index],
-                        to: blockSlots[animation.metadata.targetIndex]
+                        to: blockSlots[animation.metadata.targetIndex],
                     })
                 } else {
                     (animation as Animation<Block>).next(delta)

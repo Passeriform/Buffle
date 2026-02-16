@@ -17,9 +17,7 @@ export class Tween {
     // TODO: Add native interpolation for color. Use template for hex and rgba
     interpolate<Shape extends Record<PropertyKey, number>>(from: Shape, to: Shape, elapsed: number) {
         return Object.fromEntries(Object.keys(from).map((key) => {
-            const interpolated = from[key] + (to[key] - from[key]) * this.easingMethod(
-                elapsed / this.duration
-            )
+            const interpolated = from[key] + (to[key] - from[key]) * this.easingMethod(elapsed / this.duration)
             return [key, interpolated]
         })) as Shape
     }

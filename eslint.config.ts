@@ -40,5 +40,15 @@ export default antfu({
         "prefer-template": "off",
         "antfu/top-level-function": "off",
         "node/prefer-global/process": "off",
+        "no-restricted-syntax": ["error", {
+            selector: "TSTypeAnnotation > TSTupleType > :not(TSNamedTupleMember)",
+            message: "All tuple members must have labels.",
+        }, {
+            selector: "TSAsExpression > TSTupleType > :not(TSNamedTupleMember)",
+            message: "All tuple members must have labels.",
+        }, {
+            selector: "TSSatisfiesExpression > TSTupleType > :not(TSNamedTupleMember)",
+            message: "All tuple members must have labels.",
+        }],
     },
 })
