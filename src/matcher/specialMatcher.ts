@@ -1,8 +1,10 @@
 import { UnionSet } from "../utility/unionSet"
 import type { DirectionalMatch } from "./directionalMatcher"
 
-type SpecialMatch = {
-    type: "L" | "T" | "+" | "F" | "U" | "A" | "O" | "B",
+export type SpecialMatchType = "L" | "T" | "+" | "F" | "U" | "A" | "O" | "Q" | "B"
+
+export type SpecialMatch = {
+    type: SpecialMatchType,
     matchGroups: DirectionalMatch[][],
 }
 
@@ -40,7 +42,7 @@ const buildClusters = (matches: DirectionalMatch[]) => {
 export const extractSpecialMatches = (...matchGroups: DirectionalMatch[][]) => {
     const matchClusters = buildClusters(matchGroups.flat())
 
-    const [specialMatchGroup, [leftoverMatches]] = matchClusters.partition((matches) => matches.length >= 2)
+    const [specialMatchGroup, leftoverMatchGroup] = matchClusters.partition((matches) => matches.length >= 2)
 
     const specialMatches = specialMatchGroup.map((matches) => {
         const junctions = new Set(getJunctions(matches))
@@ -59,11 +61,11 @@ export const extractSpecialMatches = (...matchGroups: DirectionalMatch[][]) => {
                 branches,
                 collapsible,
                 blocked,
-            ],
+            ].filter((group) => group.length),
         }
     }) satisfies SpecialMatch[]
 
-    const retainMatchSet = new Set(leftoverMatches)
+    const retainMatchSet = new Set(leftoverMatchGroup.flat())
     matchGroups.forEach((group) => {
         group.splice(0, group.length, ...group.filter((match) => retainMatchSet.has(match)))
     })
