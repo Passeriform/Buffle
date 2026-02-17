@@ -1,8 +1,10 @@
-import type { Direction } from "./constants"
+import type { Animation } from "./animation"
 import type { DirectionalMatch } from "./matcher/directionalMatcher"
-import { type Animation, AnimationManager, Easing, Tween } from "./animation"
+import type { State } from "./state"
 import { BlockMergeAnimation, BlockMoveAnimation, BlockSpawnAnimation, BlockUpgradeAnimation } from "./animationList"
-import { showGameOver } from "./finalize"
+import { submitScore, updateScoreProfile } from "./api"
+import { getUserProfile, updateUserProfile } from "./auth/profile"
+import { type Direction, GameType } from "./constants"
 import { Block, BlockValue } from "./gui/block"
 import { Grid } from "./gui/grid"
 import { ResponsiveContainer } from "./gui/responsiveContainer"
@@ -11,231 +13,221 @@ import { computeMatches } from "./matcher/matcher"
 import { computeMoves } from "./movement"
 import { computeNextBlockValue } from "./utility/difficulty"
 import { padLayout, rootLayout, splitVertical } from "./utility/layout"
-import { SparseMatrix } from "./utility/sparseMatrix"
 
-// Config
-const gameSpeed = 1
-const gridDimensions = [4, 4] as [rows: number, columns: number]
-const moveTween = new Tween(200 / gameSpeed, Easing.EASE_IN_OUT)
-const mergeTween = new Tween(300 / gameSpeed, Easing.EASE_IN_OUT)
-const upgradeTween = new Tween(300 / gameSpeed, Easing.LINEAR)
-const spawnTween = new Tween(200 / gameSpeed, Easing.EASE_IN_OUT)
+export const createGame = (state: State) => {
+    // GUI components
+    const scoreText = new Text()
+    const board = new ResponsiveContainer({
+        background: "#6b3c33",
+        padding: "2%",
+        rounding: "4%",
+        min: 50,
+    })
+    const grid = new Grid({
+        gap: "8%",
+        rounding: "20%",
+        dimensions: state.dimensions,
+    })
+    const block = new Block(BlockValue.TWO, {
+        padding: "20%",
+        rounding: "20%",
+    })
+    // TODO: Move inside block widget
+    const blockValueText = new Text({
+        color: "#6a4537",
+    })
 
-// Game state
-let totalMoves = 0
-let totalScore = 0
-let gameOver = false
-const blockMap = new SparseMatrix<Block>([], gridDimensions)
-const animationManager: AnimationManager = new AnimationManager()
+    // Movement
+    const move = async (direction: Direction) => {
+        const { moves } = computeMoves(state.blockMap, direction)
 
-// GUI components
-const scoreText = new Text()
-const board = new ResponsiveContainer({
-    background: "#6b3c33",
-    padding: "2%",
-    rounding: "4%",
-    min: 50,
-})
-const grid = new Grid({
-    gap: "8%",
-    rounding: "20%",
-    dimensions: gridDimensions,
-})
-const block = new Block(BlockValue.TWO, {
-    padding: "20%",
-    rounding: "20%",
-})
-// TODO: Move inside block widget
-const blockValueText = new Text({
-    color: "#6a4537",
-})
+        if (!moves.length) {
+            return moves.length
+        }
 
-// TODO: Implement web-worker event handler
-// TODO: Add game over screen
+        const animations = moves.map(([current, targetIndex]) => new BlockMoveAnimation(state.blockMap.get(current)!, state.tweens.move, { targetIndex }))
 
-// Movement
-const move = async (direction: Direction) => {
-    const { moves } = computeMoves(blockMap, direction)
+        await state.animationManager.wait(...animations)
 
-    if (!moves.length) {
+        moves.forEach(([before, after]) => {
+            state.blockMap.updateKey(before, after)
+        })
+
         return moves.length
     }
 
-    const animations = moves.map(([current, targetIndex]) => new BlockMoveAnimation(blockMap.get(current)!, moveTween, { targetIndex }))
+    // Merge
+    const merge = async (direction: Direction) => {
+        const { primary, secondary, special } = computeMatches(state.blockMap, direction, Block.equals, 3)
 
-    await animationManager.wait(...animations)
-
-    moves.forEach(([before, after]) => {
-        blockMap.updateKey(before, after)
-    })
-
-    return moves.length
-}
-
-// Merge
-const merge = async (direction: Direction) => {
-    const { primary, secondary, special } = computeMatches(blockMap, direction, Block.equals, 3)
-
-    if (!primary.length && !secondary.length && !special.length) {
-        return primary.length + secondary.length + special.length
-    }
-
-    // TODO: Simplify animation queueing and automatically run them in draw loop
-    const mergeMatch = async (match: DirectionalMatch) => {
-        const matchBlockValues = match.indices.map((index) => blockMap.get(index)!.value)
-        const mergingList = match.indices.slice(1).map((index) => [index, match.indices[0]] as const)
-        const upgradingBlock = blockMap.get(match.indices[0])!
-        const maxBlockValue = (matchBlockValues as number[]).max() as BlockValue
-        const blockValueSum = matchBlockValues.map((value) => BlockValue.repr(value)).sum()
-
-        const mergeAnimations = mergingList.map(([sourceIndex, targetIndex]) => {
-            const animation = new BlockMergeAnimation(blockMap.get(sourceIndex)!, mergeTween, { targetIndex })
-            animationManager.onCompletion([animation], () => {
-                blockMap.delete(sourceIndex)
-            })
-            return animation
-        })
-        const upgradeAnimation = new BlockUpgradeAnimation(upgradingBlock, upgradeTween)
-        animationManager.onCompletion([upgradeAnimation], () => {
-            upgradingBlock.upgrade(BlockValue.next(maxBlockValue))
-        })
-
-        animationManager.onCompletion(mergeAnimations, () => {
-            totalScore += blockValueSum
-        })
-
-        await animationManager.wait(...mergeAnimations, upgradeAnimation)
-
-        return match.indices.length
-    }
-
-    const mergedBlocks = (await Promise.all([
-        ...primary.map(mergeMatch),
-        ...secondary.map(mergeMatch),
-        // FIXME: Async updates to game state cause missed updates in upgrade.
-        ...special.flatMap(({ matchGroups }) => matchGroups.reduceSequence(async (blockCount, matches) => {
-            const mergeCounts = await Promise.all(matches.map(mergeMatch))
-            return blockCount + mergeCounts.sum()
-        }, 0)),
-    ])).flat().sum()
-
-    return mergedBlocks
-}
-
-// Spawn
-const spawn = async () => {
-    const spawnIndex = blockMap.randomUnusedIndex()
-    const spawnValue = computeNextBlockValue(blockMap)
-
-    const spawnBlock = block.clone(spawnValue)
-    blockMap.set(spawnIndex, spawnBlock)
-
-    await animationManager.wait(new BlockSpawnAnimation(spawnBlock, spawnTween))
-}
-
-// Initializer
-export const init = () => {
-    // TODO: Add spawn animation for init
-    [8, 12, 13]
-        .forEach((index) => {
-            blockMap.set(index, block.clone())
-        })
-}
-
-// Reset handler
-const reset = () => {
-    if (!gameOver) {
-        return
-    }
-
-    totalMoves = 0
-    totalScore = 0
-    gameOver = false
-
-    blockMap.clear()
-
-    init()
-}
-
-// TODO: Cancel an update if previous takes too long
-// TODO: Add context based input handling
-
-// Update handler
-export const update = async (direction: Direction) => {
-    if (gameOver) {
-        return
-    }
-
-    let updatePerformed = false
-    let loopPerformed = false
-
-    do {
-        const movedBlocks = await move(direction)
-        const mergedBlocks = await merge(direction)
-
-        loopPerformed = Boolean(movedBlocks) || Boolean(mergedBlocks)
-        updatePerformed ||= loopPerformed
-    } while (loopPerformed)
-
-    if (!updatePerformed) {
-        return
-    }
-
-    totalMoves++
-
-    await spawn()
-
-    // Eager check for creating matches on spawn
-    await merge(direction)
-
-    // TODO: Check another round for merges after spawning a new block
-
-    // Check for game over
-    if (blockMap.size === blockMap.maxSize) {
-        // TODO: Move together when state moves into a separate class
-        gameOver = true
-        showGameOver(totalScore, totalMoves, reset)
-    }
-}
-
-// Draw loop
-export const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) => {
-    // Clear canvas
-    ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-
-    // Render
-    const root = padLayout(rootLayout(ctx.canvas), 50)
-    const [scoreSlot, boardSlot] = splitVertical(root, root.height / 8)
-    scoreText.render(ctx, scoreSlot, `Score: ${totalScore}`)
-    const gridSlot = board.render(ctx, padLayout(boardSlot, 50))
-    const blockSlots = grid.render(ctx, gridSlot)
-    blockMap.forEach((block, index) => {
-        if (!block) {
-            throw new Error(`Block undefined at index: ${index}`)
+        if (!primary.length && !secondary.length && !special.length) {
+            return primary.length + secondary.length + special.length
         }
 
-        // Interpolate animations
-        // TODO: Move run logic into animationManager
-        // FIXME: Add animation ordering. Blocks are going over the upgraded one on merge
-        if (animationManager.has(block)) {
-            const animations = animationManager.get(block)!
+        // TODO: Simplify animation queueing and automatically run them in draw loop
+        const mergeMatch = async (match: DirectionalMatch) => {
+            const matchBlockValues = match.indices.map((index) => state.blockMap.get(index)!.value)
+            const mergingList = match.indices.slice(1).map((index) => [index, match.indices[0]] as const)
+            const upgradingBlock = state.blockMap.get(match.indices[0])!
+            const maxBlockValue = (matchBlockValues as number[]).max() as BlockValue
+            const blockValueSum = matchBlockValues.map((value) => BlockValue.repr(value)).sum()
 
-            animations.forEach((animation) => {
-                if (animation instanceof BlockMoveAnimation) {
-                    animation.next(delta, {
-                        from: blockSlots[index],
-                        to: blockSlots[animation.metadata.targetIndex],
-                    })
-                } else {
-                    (animation as Animation<Block>).next(delta)
-                }
+            const mergeAnimations = mergingList.map(([sourceIndex, targetIndex]) => {
+                const animation = new BlockMergeAnimation(state.blockMap.get(sourceIndex)!, state.tweens.merge, { targetIndex })
+                state.animationManager.onCompletion([animation], () => {
+                    state.blockMap.delete(sourceIndex)
+                })
+                return animation
             })
+            const upgradeAnimation = new BlockUpgradeAnimation(upgradingBlock, state.tweens.upgrade)
+            state.animationManager.onCompletion([upgradeAnimation], () => {
+                upgradingBlock.upgrade(BlockValue.next(maxBlockValue))
+            })
+
+            state.animationManager.onCompletion(mergeAnimations, () => {
+                state.score += blockValueSum
+            })
+
+            await state.animationManager.wait(...mergeAnimations, upgradeAnimation)
+
+            return match.indices.length
         }
 
-        const valueSlot = block.render(ctx, blockSlots[index])
-        blockValueText.render(ctx, valueSlot, `${BlockValue.repr(block.value)}`)
-    })
+        const mergedBlocks = (await Promise.all([
+            ...primary.map(mergeMatch),
+            ...secondary.map(mergeMatch),
+            // FIXME: Async updates to game state cause missed updates in upgrade.
+            ...special.flatMap(({ matchGroups }) => matchGroups.reduceSequence(async (blockCount, matches) => {
+                const mergeCounts = await Promise.all(matches.map(mergeMatch))
+                return blockCount + mergeCounts.sum()
+            }, 0)),
+        ])).flat().sum()
 
-    // Recurse calls
-    requestAnimationFrame((delta) => draw(delta, ctx))
+        return mergedBlocks
+    }
+
+    // Spawn
+    const spawn = async () => {
+        const spawnIndex = state.blockMap.randomUnusedIndex()
+        const spawnValue = computeNextBlockValue(state.blockMap)
+
+        const spawnBlock = block.clone(spawnValue)
+        state.blockMap.set(spawnIndex, spawnBlock)
+
+        await state.animationManager.wait(new BlockSpawnAnimation(spawnBlock, state.tweens.spawn))
+    }
+
+    const init = () => {
+        // TODO: Add spawn animation for init
+        [8, 12, 13]
+            .forEach((index) => {
+                state.blockMap.set(index, block.clone())
+            })
+    }
+
+    // TODO: Cancel an update if previous takes too long
+    // TODO: Add context based input handling
+    // TODO: Implement web-worker event handler
+
+    // Update handler
+    const update = async (direction: Direction) => {
+        let updatePerformed = false
+        let loopPerformed = false
+
+        do {
+            const movedBlocks = await move(direction)
+            const mergedBlocks = await merge(direction)
+
+            loopPerformed = Boolean(movedBlocks) || Boolean(mergedBlocks)
+            updatePerformed ||= loopPerformed
+        } while (loopPerformed)
+
+        if (!updatePerformed) {
+            return
+        }
+
+        state.moves++
+
+        await spawn()
+
+        // Eager check for creating matches on spawn
+        await merge(direction)
+
+        // Check for state end
+        if (state.blockMap.size === state.blockMap.maxSize) {
+            state.end()
+        }
+    }
+
+    // Draw loop
+    const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) => {
+        const root = padLayout(rootLayout(ctx.canvas), 50)
+        const [scoreSlot, boardSlot] = splitVertical(root, root.height / 8)
+
+        scoreText.render(ctx, scoreSlot, `Score: ${state.score}`)
+
+        const gridSlot = board.render(ctx, padLayout(boardSlot, 50))
+        const blockSlots = grid.render(ctx, gridSlot)
+
+        state.blockMap.forEach((block, index) => {
+            if (!block) {
+                throw new Error(`Block undefined at index: ${index}`)
+            }
+
+            // Interpolate animations
+            // TODO: Move state logic into animationManager
+            // FIXME: Add animation ordering. Blocks are going over the upgraded one on merge
+            if (state.animationManager.has(block)) {
+                const animations = state.animationManager.get(block)!
+
+                animations.forEach((animation) => {
+                    if (animation instanceof BlockMoveAnimation) {
+                        animation.next(delta, {
+                            from: blockSlots[index],
+                            to: blockSlots[animation.metadata.targetIndex],
+                        })
+                    } else {
+                        (animation as Animation<Block>).next(delta)
+                    }
+                })
+            }
+
+            const valueSlot = block.render(ctx, blockSlots[index])
+            blockValueText.render(ctx, valueSlot, `${BlockValue.repr(block.value)}`)
+        })
+    }
+
+    const end = async () => {
+        const { name, taunt } = getUserProfile()
+
+        const runId = await submitScore({ gameType: GameType.CLASSIC, name, score: state.score, moves: state.moves, taunt })
+
+        const gameOverElement = document.querySelector("buffle-game-over")!
+
+        gameOverElement.score = state.score
+        gameOverElement.moves = state.moves
+
+        gameOverElement.addEventListener("restart", () => {
+            gameOverElement.hide()
+            state.reset()
+        })
+
+        gameOverElement.show()
+
+        const leaderboardElement = document.querySelector("buffle-leaderboard")!
+
+        leaderboardElement.refresh()
+        leaderboardElement.editableId = runId
+
+        leaderboardElement.addEventListener("update:name", (event) => {
+            updateScoreProfile({ id: runId, name: event.detail })
+            updateUserProfile({ name: event.detail })
+        })
+        leaderboardElement.addEventListener("update:taunt", (event) => {
+            updateScoreProfile({ id: runId, taunt: event.detail })
+            updateUserProfile({ taunt: event.detail })
+        })
+    }
+
+    return { init, update, draw, end }
 }

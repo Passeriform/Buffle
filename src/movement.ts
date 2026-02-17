@@ -57,6 +57,7 @@ const moveSingle = <T>(state: SparseMatrix<T>, index: number, direction: Directi
 }
 
 export const computeMoves = <T extends object>(state: SparseMatrix<T>, direction: Direction) => {
+    // TODO: Use freed index set to track available blocks and reduce iteration count
     const copyState = new SparseMatrix<T>(state, state.shape)
 
     const moves: Move[] = []
