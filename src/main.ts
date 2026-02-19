@@ -21,6 +21,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         controls.unbind()
         end()
     })
+    state.addEventListener("game:reset", () => {
+        state.start()
+    })
 
     state.start()
 
