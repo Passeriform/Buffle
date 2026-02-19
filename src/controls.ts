@@ -5,7 +5,7 @@ import { ProcessQueue } from "./utility/processQueue"
 
 export class Controls {
     private dragState: Map<number, { x: number, y: number }>
-    private processQueue: ProcessQueue<void>
+    private processQueue?: ProcessQueue<void>
     private flushQueue?: () => void
 
     private root?: HTMLElement
@@ -14,13 +14,13 @@ export class Controls {
     // Listeners
     private keyDownListener = (event: KeyboardEvent) => {
         if (["ArrowUp", "w", "W"].includes(event.key)) {
-            this.processQueue.addTask(() => this.handler!(Direction.UP))
+            this.processQueue?.addTask(() => this.handler!(Direction.UP))
         } else if (["ArrowDown", "s", "S"].includes(event.key)) {
-            this.processQueue.addTask(() => this.handler!(Direction.DOWN))
+            this.processQueue?.addTask(() => this.handler!(Direction.DOWN))
         } else if (["ArrowLeft", "a", "A"].includes(event.key)) {
-            this.processQueue.addTask(() => this.handler!(Direction.LEFT))
+            this.processQueue?.addTask(() => this.handler!(Direction.LEFT))
         } else if (["ArrowRight", "d", "D"].includes(event.key)) {
-            this.processQueue.addTask(() => this.handler!(Direction.RIGHT))
+            this.processQueue?.addTask(() => this.handler!(Direction.RIGHT))
         }
     }
 
@@ -41,9 +41,9 @@ export class Controls {
         const dy = event.clientY - start.y
 
         if (Math.abs(dx) > Math.abs(dy))
-            this.processQueue.addTask(() => this.handler!(dx > 0 ? Direction.RIGHT : Direction.LEFT))
+            this.processQueue?.addTask(() => this.handler!(dx > 0 ? Direction.RIGHT : Direction.LEFT))
         else
-            this.processQueue.addTask(() => this.handler!(dy > 0 ? Direction.DOWN : Direction.UP))
+            this.processQueue?.addTask(() => this.handler!(dy > 0 ? Direction.DOWN : Direction.UP))
     }
 
     private pointerCancelListener = (event: PointerEvent) => {
@@ -78,7 +78,6 @@ export class Controls {
 
     constructor() {
         this.dragState = new Map()
-        this.processQueue = new ProcessQueue()
     }
 
     async bind(rootElementId: string, handler: (action: Direction) => Promise<void>) {
@@ -91,6 +90,8 @@ export class Controls {
         this.root = root
 
         this.handler = handler
+
+        this.processQueue = new ProcessQueue()
         this.flushQueue = await this.processQueue.run()
 
         this.bindKeyboard()
