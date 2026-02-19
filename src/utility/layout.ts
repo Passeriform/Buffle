@@ -13,11 +13,11 @@ export const rootLayout = (element: HTMLElement) => ({
     height: element.clientHeight,
 } satisfies Layout | undefined)
 
-export const padLayout = (layout: Layout, padding: number) => ({
-    top: layout.top + padding,
-    left: layout.left + padding,
-    width: layout.width - (2 * padding),
-    height: layout.height - (2 * padding),
+export const padLayout = (layout: Layout, padding: `${number}%`) => ({
+    top: layout.top + (Number.parseFloat(padding) * layout.width / 100),
+    left: layout.left + (Number.parseFloat(padding) * layout.width / 100),
+    width: layout.width - (2 * (Number.parseFloat(padding) * layout.width / 100)),
+    height: layout.height - (2 * (Number.parseFloat(padding) * layout.width / 100)),
 })
 
 // TODO: Create Cassowary constraint resolver instead of this.

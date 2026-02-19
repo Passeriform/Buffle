@@ -16,12 +16,11 @@ import { padLayout, rootLayout, splitVertical } from "./utility/layout"
 
 export const createGame = (state: State) => {
     // GUI components
-    const scoreText = new Text()
+    const statText = new Text()
     const board = new ResponsiveContainer({
         background: "#6b3c33",
         padding: "2%",
         rounding: "4%",
-        min: 50,
     })
     const grid = new Grid({
         gap: "8%",
@@ -161,12 +160,12 @@ export const createGame = (state: State) => {
 
     // Draw loop
     const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) => {
-        const root = padLayout(rootLayout(ctx.canvas), 50)
+        const root = padLayout(rootLayout(ctx.canvas), "2%")
         const [scoreSlot, boardSlot] = splitVertical(root, root.height / 8)
 
-        scoreText.render(ctx, scoreSlot, `Score: ${state.score}`)
+        statText.render(ctx, padLayout(scoreSlot, "2%"), `Score: ${state.score}\nMoves: ${state.moves}`)
 
-        const gridSlot = board.render(ctx, padLayout(boardSlot, 50))
+        const gridSlot = board.render(ctx, padLayout(boardSlot, "2%"))
         const blockSlots = grid.render(ctx, gridSlot)
 
         state.blockMap.forEach((block, index) => {
