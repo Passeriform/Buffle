@@ -35,7 +35,7 @@ export class Grid extends Widget<GridOptions, never, "1**"> {
                     height: inLayout.height / this.options.dimensions[0],
                 }),
             ),
-        ).map((layout) => padLayout(layout, this.resolveDependent(this.options.gap, layout)))
+        ).map((layout) => padLayout(layout, this.options.gap))
 
         return layoutGrid
     }
@@ -50,13 +50,13 @@ export class Grid extends Widget<GridOptions, never, "1**"> {
                 layout.top,
                 layout.width,
                 layout.height,
-                this.resolveDependent(this.options.rounding, layout),
+                Math.max(0, this.resolveDependent(this.options.rounding, layout)),
             )
         })
         ctx.fill()
     }
 
     override getSlots(layouts: Layout[]) {
-        return layouts.map((layout) => padLayout(layout, this.resolveDependent(this.options.padding, layout)))
+        return layouts.map((layout) => padLayout(layout, this.options.padding))
     }
 }

@@ -53,6 +53,6 @@ export class ResponsiveContainer extends Widget<ResponsiveContainerOptions> {
     }
 
     override getSlots(layout: Layout) {
-        return padLayout(layout, this.resolveDependent(this.options.padding, layout))
+        return padLayout(layout, this.options.padding)
     }
 }

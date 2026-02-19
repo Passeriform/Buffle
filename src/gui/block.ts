@@ -85,13 +85,13 @@ export class Block extends Widget<BlockOptions & { background: string }> {
             layout.top,
             layout.width,
             layout.height,
-            this.resolveDependent(this.options.rounding, layout),
+            Math.max(0, this.resolveDependent(this.options.rounding, layout)),
         )
         ctx.fill()
     }
 
     override getSlots(layout: Layout) {
-        return padLayout(layout, this.resolveDependent(this.options.padding, layout))
+        return padLayout(layout, this.options.padding)
     }
 
     get value(): Readonly<BlockValue> {
