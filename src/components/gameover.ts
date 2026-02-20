@@ -1,4 +1,5 @@
 import { parseStyleSheet, parseTemplate } from "../utility/dom"
+import rawElementsStyleSheet from "./elements.css?raw"
 import rawStyleSheet from "./gameover.css?raw"
 import rawTemplate from "./gameover.html?raw"
 
@@ -20,8 +21,10 @@ export class GameOverElement extends HTMLElement {
         super()
         this.#root = this.attachShadow({ mode: "open" })
         const template = parseTemplate(rawTemplate)
-        const styleSheet = parseStyleSheet(rawStyleSheet)
-        this.#root.adoptedStyleSheets = [styleSheet]
+        this.#root.adoptedStyleSheets = [
+            parseStyleSheet(rawStyleSheet),
+            parseStyleSheet(rawElementsStyleSheet),
+        ]
         this.#root.append(template.content.cloneNode(true))
     }
 
@@ -68,16 +71,6 @@ export class GameOverElement extends HTMLElement {
 
     attributeChangedCallback() {
         this.#loadRestartKeys()
-    }
-
-    /* eslint-disable-next-line accessor-pairs -- Property should only be set programmatically */
-    set score(value: number) {
-        this.#root.querySelector("[data-score]")!.textContent = String(value)
-    }
-
-    /* eslint-disable-next-line accessor-pairs -- Property should only be set programmatically */
-    set moves(value: number) {
-        this.#root.querySelector("[data-moves]")!.textContent = String(value)
     }
 
     show() {

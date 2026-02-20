@@ -1,0 +1,32 @@
+:host {
+    --scale: 1vmin;
+
+    display: flex;
+    justify-content: space-between;
+    gap: calc(15 * var(--scale));
+}
+
+:host > .block {
+    display: flex;
+    flex-direction: column;
+    width: calc(20 * var(--scale));
+    padding: calc(0.5 * var(--scale));
+    padding-top: 0;
+    border-radius: calc(0.5 * var(--scale));
+    background-color: #6b3c33;
+    text-align: center;
+}
+
+:host > .block > .label {
+    margin-block: calc(0.2 * var(--scale));
+    font-size: calc(2 * var(--scale));
+}
+
+:host > .block > .content {
+    width: 100%;
+    padding-block: calc(0.5 * var(--scale));
+    border-radius: calc(0.5 * var(--scale));
+    background-color: #ff9b84;
+    font-size: calc(4 * var(--scale));
+    font-weight: 700;
+}

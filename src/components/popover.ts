@@ -1,4 +1,5 @@
 import { parseStyleSheet, parseTemplate } from "../utility/dom"
+import rawElementsStyleSheet from "./elements.css?raw"
 import rawStyleSheet from "./popover.css?raw"
 import rawHtml from "./popover.html?raw"
 
@@ -18,8 +19,10 @@ export class PopoverElement extends HTMLElement {
         super()
         this.#root = this.attachShadow({ mode: "open" })
         const template = parseTemplate(rawHtml)
-        const styleSheet = parseStyleSheet(rawStyleSheet)
-        this.#root.adoptedStyleSheets = [styleSheet]
+        this.#root.adoptedStyleSheets = [
+            parseStyleSheet(rawStyleSheet),
+            parseStyleSheet(rawElementsStyleSheet),
+        ]
         this.#root.append(template.content.cloneNode(true))
 
         const slot = this.#root.querySelector("slot")

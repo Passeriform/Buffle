@@ -12,11 +12,10 @@ import { Text } from "./gui/text"
 import { computeMatches } from "./matcher/matcher"
 import { computeMoves } from "./movement"
 import { computeNextBlockValue } from "./utility/difficulty"
-import { padLayout, rootLayout, splitVertical } from "./utility/layout"
+import { rootLayout } from "./utility/layout"
 
 export const createGame = (state: State) => {
     // GUI components
-    const statText = new Text()
     const board = new ResponsiveContainer({
         background: "#6b3c33",
         padding: "2%",
@@ -117,8 +116,11 @@ export const createGame = (state: State) => {
     }
 
     const init = () => {
+        state.score = 0
+        state.moves = 0
+
         // TODO: Add spawn animation for init
-        [8, 12, 13]
+        ;[8, 12, 13]
             .forEach((index) => {
                 state.blockMap.set(index, block.clone())
             })
@@ -160,12 +162,9 @@ export const createGame = (state: State) => {
 
     // Draw loop
     const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) => {
-        const root = padLayout(rootLayout(ctx.canvas), "2%")
-        const [scoreSlot, boardSlot] = splitVertical(root, root.height / 8)
+        const root = rootLayout(ctx.canvas)
 
-        statText.render(ctx, padLayout(scoreSlot, "2%"), `Score: ${state.score}\nMoves: ${state.moves}`)
-
-        const gridSlot = board.render(ctx, padLayout(boardSlot, "2%"))
+        const gridSlot = board.render(ctx, root)
         const blockSlots = grid.render(ctx, gridSlot)
 
         state.blockMap.forEach((block, index) => {
@@ -202,9 +201,6 @@ export const createGame = (state: State) => {
         const runId = await submitScore({ gameType: GameType.CLASSIC, name, score: state.score, moves: state.moves, taunt })
 
         const gameOverElement = document.querySelector("buffle-game-over")!
-
-        gameOverElement.score = state.score
-        gameOverElement.moves = state.moves
 
         gameOverElement.addEventListener("restart", () => {
             gameOverElement.hide()
