@@ -3,20 +3,7 @@
     <div class="backdrop"></div>
     <div class="splash">
         <h1 class="heading">GAME OVER</h1>
-        <section class="stats">
-            <div class="block">
-                <h3 class="heading">Score</h3>
-                <div class="content">
-                    <h2 data-score></h2>
-                </div>
-            </div>
-            <div class="block">
-                <h3 class="heading">Moves</h3>
-                <div class="content">
-                    <h2 data-moves></h2>
-                </div>
-            </div>
-        </section>
+        <slot name="stats"></slot>
         <button class="action" data-restart>Press (r) to restart</button>
         <slot></slot>
     </div>

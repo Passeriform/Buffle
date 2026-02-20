@@ -68,6 +68,7 @@ export class State extends EventTarget {
 
     set score(score: number) {
         this.state.score = score
+        this.dispatchEvent(new CustomEvent("stats:update"))
     }
 
     get moves() {
@@ -76,6 +77,7 @@ export class State extends EventTarget {
 
     set moves(moves: number) {
         this.state.moves = moves
+        this.dispatchEvent(new CustomEvent("stats:update"))
     }
 
     get isGameOver() {
@@ -83,12 +85,12 @@ export class State extends EventTarget {
     }
 
     start() {
-        this.dispatchEvent(new Event("game:start"))
+        this.dispatchEvent(new CustomEvent("game:start"))
     }
 
     end() {
         this.state.isGameOver = true
-        this.dispatchEvent(new Event("game:end"))
+        this.dispatchEvent(new CustomEvent("game:end"))
     }
 
     reset() {
@@ -96,6 +98,6 @@ export class State extends EventTarget {
         this.state.score = 0
         this.state.isGameOver = false
         this.state.blockMap.clear()
-        this.dispatchEvent(new Event("game:reset"))
+        this.dispatchEvent(new CustomEvent("game:reset"))
     }
 }

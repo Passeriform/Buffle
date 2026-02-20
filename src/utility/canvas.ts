@@ -7,11 +7,11 @@ const fitCanvas = () => {
         throw new Error("Canvas is not ready yet")
     }
 
-    canvas.width = canvas.offsetWidth
-    canvas.height = canvas.offsetHeight
+    canvas.width = canvas.clientWidth
+    canvas.height = canvas.clientHeight
 }
 
-export const createCanvas = (elementTag: string, background: string = "#ffffff") => {
+export const createScreen = (elementTag: string, background: string = "#ffffff") => {
     const root = document.getElementById(elementTag)
 
     if (!root) {

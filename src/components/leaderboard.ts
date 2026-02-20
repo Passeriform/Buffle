@@ -1,6 +1,7 @@
 import type { GameType } from "../constants"
 import { type LeaderboardData, loadScores } from "../api"
 import { parseStyleSheet, parseTemplate } from "../utility/dom"
+import rawElementsStyleSheet from "./elements.css?raw"
 import rawStyleSheet from "./leaderboard.css?raw"
 import rawHtml from "./leaderboard.html?raw"
 
@@ -29,8 +30,10 @@ export class LeaderboardElement extends HTMLElement {
         super()
         this.#root = this.attachShadow({ mode: "open" })
         const template = parseTemplate(rawHtml)
-        const styleSheet = parseStyleSheet(rawStyleSheet)
-        this.#root.adoptedStyleSheets = [styleSheet]
+        this.#root.adoptedStyleSheets = [
+            parseStyleSheet(rawStyleSheet),
+            parseStyleSheet(rawElementsStyleSheet),
+        ]
         this.#root.append(template.content.cloneNode(true))
         this.#bodySlot = this.#root.querySelector("[data-slot]")!
         this.#loaderTemplate = this.#root.querySelector("[data-loader]")!

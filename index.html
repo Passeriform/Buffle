@@ -7,12 +7,16 @@
         <title>Buffle</title>
         <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="/style.css" />
-        <link rel="stylesheet" href="/canvas.css" />
+        <link rel="stylesheet" href="/game.css" />
     </head>
 
     <body>
-        <div id="root"></div>
+        <div id="game-container">
+            <buffle-stats slot="stats" [data-stats]></buffle-stats>
+            <div id="root"></div>
+        </div>
         <buffle-game-over restart-key="r">
+            <buffle-stats slot="stats" [data-stats]></buffle-stats>
             <buffle-leaderboard game-type="classic"></buffle-leaderboard>
         </buffle-game-over>
         <script type="module" src="./src/components/registry.ts"></script>

@@ -41,26 +41,6 @@
     margin: 1rem 5vw;
 }
 
-:host input {
-    margin: 0.25rem;
-    padding: 1rem 1rem;
-    font-size: 1.5rem;
-    text-align: center;
-    border: none;
-    border-radius: 0.5rem;
-    background-color: #ff9b84;
-}
-
-:host input:hover {
-    outline: 0.2rem solid #6b3c33;
-}
-
-:host input:focus {
-    background-color: #6b3c33;
-    outline: 0.2rem solid #6b3c33;
-    box-shadow: 0 0 0.3rem 0.05rem #1f1412 inset;
-}
-
 :host input[data-taunt] {
     width: 25rem;
 }
@@ -83,8 +63,4 @@
     mask: var(--spin-gradient);
     mask-composite: subtract;
     animation: spin 1s infinite linear;
-}
-
-:host #loader > .text {
-    margin: 0;
 }
