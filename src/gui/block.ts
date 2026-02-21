@@ -18,24 +18,7 @@ export enum BlockValue {
 
 /* eslint-disable-next-line ts/no-namespace -- Adding methods to enum needs namespace based import merging */
 export namespace BlockValue {
-    export const repr = (value: BlockValue): number => {
-        return 2 ** (value + 1)
-    }
-
-    export const next = (value: BlockValue): BlockValue => {
-        return value + 1 as BlockValue
-    }
-}
-
-type BlockOptions = WidgetOptions & {
-    rounding: `${number}%`
-}
-
-// TODO: Give bevel 3d look to block
-export class Block extends Widget<BlockOptions & { background: string }> {
-    private _value: BlockValue
-
-    public static readonly COLOR_MAPPING = {
+    const COLOR_MAPPING = {
         [BlockValue.TWO]: "#ffd6cc",
         [BlockValue.FOUR]: "#ffb8a8",
         [BlockValue.EIGHT]: "#ff9b84",
@@ -49,6 +32,27 @@ export class Block extends Widget<BlockOptions & { background: string }> {
         [BlockValue.TWENTY_FORTY_EIGHT]: "#3d120b",
         [BlockValue.FORTY_NINETY_SIX]: "#240a06",
     } satisfies Record<BlockValue, string>
+
+    export const repr = (value: BlockValue) => {
+        return 2 ** (value + 1)
+    }
+
+    export const next = (value: BlockValue) => {
+        return value + 1 as BlockValue
+    }
+
+    export const color = (value: BlockValue) => {
+        return COLOR_MAPPING[value]
+    }
+}
+
+type BlockOptions = WidgetOptions & {
+    rounding: `${number}%`
+}
+
+// TODO: Give bevel 3d look to block
+export class Block extends Widget<BlockOptions & { background: string }> {
+    private _value: BlockValue
 
     static equals(first: Block, second: Block) {
         return first._value === second._value
@@ -65,7 +69,7 @@ export class Block extends Widget<BlockOptions & { background: string }> {
         })
 
         this._value = value
-        this.makeDynamicOption("background", () => Block.COLOR_MAPPING[this._value])
+        this.makeDynamicOption("background", () => BlockValue.color(this._value))
     }
 
     override clone(value?: number) {

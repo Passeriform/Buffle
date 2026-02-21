@@ -67,6 +67,38 @@ export const splitHorizontal = (layout: Layout, ...widths: number[]) => {
     return layouts
 }
 
+export const fitLayout = (layout: Layout) => {
+    const base = Math.min(layout.width, layout.height)
+    const [xCenter, yCenter] = [
+        layout.left + (layout.width / 2),
+        layout.top + (layout.height / 2),
+    ]
+
+    return {
+        left: xCenter - (base / 2),
+        top: yCenter - (base / 2),
+        width: base,
+        height: base,
+    }
+}
+
+export const layoutGrid = (layout: Layout, dimensions: [rows: number, column: number], gap: `${number}%`) => {
+    const cellLayouts = []
+
+    for (let row = 0; row < dimensions[0]; ++row) {
+        for (let column = 0; column < dimensions[1]; ++column) {
+            cellLayouts.push(padLayout({
+                left: layout.left + (column * layout.width / dimensions[1]),
+                top: layout.top + (row * layout.height / dimensions[0]),
+                width: layout.width / dimensions[1],
+                height: layout.height / dimensions[0],
+            }, gap))
+        }
+    }
+
+    return cellLayouts
+}
+
 export const wireframe = (ctx: CanvasRenderingContext2D, layout: Layout) => {
     const styleBackup = [ctx.fillStyle, ctx.strokeStyle] as const
 
