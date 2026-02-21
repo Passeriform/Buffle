@@ -6,37 +6,13 @@ export type WidgetOptions = {
     padding: `${number}%`
 }
 
-type RenderChain = `${"1" | "*"}${"1" | "*"}${"1" | "*"}`
-
-type PickRenderType<
-    RC extends RenderChain,
-    Type extends "In" | "Render" | "Slot",
-> =
-    RC extends `${infer I}${infer R}${infer S}`
-        ? Type extends "In" ? I
-            : Type extends "Render" ? R
-                : Type extends "Slot" ? S
-                    : never
-        : never
-
-type ResolveLayout<
-    RC extends RenderChain,
-    Type extends "In" | "Render" | "Slot",
-> =
-    PickRenderType<RC, Type> extends "1" ? Layout : PickRenderType<RC, Type> extends "*" ? Layout[] : never
-
-type InLayout<T extends RenderChain> = ResolveLayout<T, "In">
-type RenderLayout<T extends RenderChain> = ResolveLayout<T, "Render">
-type SlotLayout<T extends RenderChain> = ResolveLayout<T, "Slot">
-
 // TODO: Make every widget pre-render in separate canvas context
 export abstract class Widget<
     Options extends WidgetOptions = WidgetOptions,
     State = never,
-    Chaining extends RenderChain = "111",
 > {
     protected baseOptions: Options
-    public layoutOverride?: InLayout<Chaining>
+    public layoutOverride?: Layout
     // TODO: Use proxy object on options for fine-grained mutation
     public optionsOverride: Partial<Options> = {}
 
@@ -63,15 +39,15 @@ export abstract class Widget<
         return (Object.keys(this.baseOptions) as (keyof Options)[]).reduce((acc, key) => ({ ...acc, [key]: this.optionsOverride?.[key] ?? acc[key] }), this.baseOptions)
     }
 
-    protected abstract getRenderLayouts(inLayout: InLayout<Chaining>): RenderLayout<Chaining>
+    protected abstract getRenderLayouts(inLayout: Layout): Layout
 
-    protected abstract draw(ctx: CanvasRenderingContext2D, selfLayouts: RenderLayout<Chaining>, ...state: ([State] extends [never] ? [undefined?] : [State])): void
+    protected abstract draw(ctx: CanvasRenderingContext2D, selfLayouts: Layout, ...state: ([State] extends [never] ? [undefined?] : [State])): void
 
-    protected abstract getSlots(selfLayouts: RenderLayout<Chaining>): SlotLayout<Chaining>
+    protected abstract getSlots(selfLayouts: Layout): Layout
 
     abstract clone(): this
 
-    render(ctx: CanvasRenderingContext2D, inLayout: InLayout<Chaining>, ...state: ([State] extends [never] ? [undefined?] : [State])) {
+    render(ctx: CanvasRenderingContext2D, inLayout: Layout, ...state: ([State] extends [never] ? [undefined?] : [State])) {
         const renderLayouts = this.getRenderLayouts(this.layoutOverride ?? inLayout)
         ctx.save()
         this.draw(ctx, renderLayouts, ...state)
@@ -81,5 +57,3 @@ export abstract class Widget<
         return slots
     }
 }
-
-export type AnyWidget = Widget<any, any, any>

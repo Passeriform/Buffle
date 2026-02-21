@@ -1,4 +1,4 @@
-import type { AnyWidget } from "../gui/widget"
+import type { Widget } from "../gui/widget"
 import type { Easing, EasingMethod } from "./easing"
 import type { Tween } from "./tween"
 import { Signal } from "./signal"
@@ -8,7 +8,7 @@ export type TweenOptions = {
     easing?: Easing | EasingMethod
 }
 
-export abstract class Animation<W extends AnyWidget, DeferArgs extends Record<PropertyKey, unknown> | never = never> {
+export abstract class Animation<W extends Widget, DeferArgs extends Record<PropertyKey, unknown> | never = never> {
     private tween: Tween
 
     public readonly widget: W
@@ -49,5 +49,3 @@ export abstract class Animation<W extends AnyWidget, DeferArgs extends Record<Pr
         this.widget.optionsOverride = {}
     }
 }
-
-export type AnyAnimation = Animation<AnyWidget, any>

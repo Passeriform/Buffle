@@ -1,6 +1,6 @@
 import type { Layout } from "./utility/layout"
 import { Animation, type Tween } from "./animation"
-import { Block, BlockValue } from "./gui/block"
+import { type Block, BlockValue } from "./gui/block"
 import { mergeRGBChannels, parseColorHex, splitRGBChannels, toColorHex } from "./utility/color"
 
 type BlockMoveMetadata = { targetIndex: number }
@@ -35,8 +35,8 @@ export class BlockMergeAnimation extends BlockMoveAnimation {
 
 export class BlockUpgradeAnimation extends Animation<Block> {
     override next(delta: number) {
-        const beforeColor = parseColorHex(Block.COLOR_MAPPING[this.widget.value])
-        const afterColor = parseColorHex(Block.COLOR_MAPPING[BlockValue.next(this.widget.value)])
+        const beforeColor = parseColorHex(BlockValue.color(this.widget.value))
+        const afterColor = parseColorHex(BlockValue.color(BlockValue.next(this.widget.value)))
         const [rb, gb, bb] = splitRGBChannels(beforeColor)
         const [ra, ga, ba] = splitRGBChannels(afterColor)
         const { red, green, blue } = this.interpolate(

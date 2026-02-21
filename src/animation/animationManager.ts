@@ -1,18 +1,18 @@
-import type { AnyWidget } from "../gui/widget"
-import type { Animation, AnyAnimation } from "./animation"
+import type { Widget } from "../gui/widget"
+import type { Animation } from "./animation"
 
 export class AnimationManager {
-    private animations: WeakMap<AnyWidget, Set<AnyAnimation>>
+    private animations: WeakMap<Widget, Set<Animation<Widget, any>>>
 
     constructor() {
         this.animations = new WeakMap()
     }
 
-    has<W extends AnyWidget>(item: W) {
+    has<W extends Widget>(item: W) {
         return this.animations.has(item) && [...this.animations.get(item)!].map((animation) => !animation.completed.value)
     }
 
-    add<W extends AnyWidget, A extends Animation<W, any>>(...animations: A[]) {
+    add<W extends Widget, A extends Animation<W, any>>(...animations: A[]) {
         animations.forEach((animation) => {
             const current = this.animations.get(animation.widget) ?? new Set()
             current.add(animation)
@@ -20,17 +20,17 @@ export class AnimationManager {
         })
     }
 
-    get<W extends AnyWidget>(item: W) {
+    get<W extends Widget>(item: W) {
         return [...this.animations.get(item) ?? []].filter((animation) => !animation.completed.value) as Animation<W, any>[] | undefined
     }
 
-    wait(...animations: AnyAnimation[]) {
+    wait(...animations: Animation<Widget, any>[]) {
         this.add(...animations)
         return Promise.allSettled(animations.map((animation) => animation.completed.promise))
     }
 
     // TODO: Rename to sideEffect
-    onCompletion(animations: AnyAnimation[], callback: () => void) {
+    onCompletion(animations: Animation<Widget, any>[], callback: () => void) {
         this.wait(...animations).then(callback)
     }
 }
