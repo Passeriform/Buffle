@@ -5,7 +5,7 @@ import { BlockMergeAnimation, BlockMoveAnimation, BlockSpawnAnimation, BlockUpgr
 import { submitScore, updateScoreProfile } from "./api"
 import { getUserProfile, updateUserProfile } from "./auth/profile"
 import { type Direction, GameType } from "./constants"
-import { Block, BlockValue } from "./gui/block"
+import { Block, BLOCK_DISPLAY_SET, BLOCK_PALLETTES } from "./gui/block"
 import { Container } from "./gui/container"
 import { Text } from "./gui/text"
 import { computeMatches } from "./matcher/matcher"
@@ -24,9 +24,11 @@ export const createGame = (state: State) => {
         background: "#5a2f28",
         rounding: "20%",
     })
-    const block = new Block(BlockValue.TWO, {
+    const block = new Block(0, {
         padding: "20%",
         rounding: "20%",
+        pallette: BLOCK_PALLETTES.COFFEE,
+        displayValues: BLOCK_DISPLAY_SET.NUMBERS,
     })
     // TODO: Move inside block widget
     const blockValueText = new Text({
@@ -62,11 +64,11 @@ export const createGame = (state: State) => {
 
         // TODO: Simplify animation queueing and automatically run them in draw loop
         const mergeMatch = async (match: DirectionalMatch) => {
-            const matchBlockValues = match.indices.map((index) => state.blockMap.get(index)!.value)
             const mergingList = match.indices.slice(1).map((index) => [index, match.indices[0]] as const)
-            const upgradingBlock = state.blockMap.get(match.indices[0])!
-            const maxBlockValue = (matchBlockValues as number[]).max() as BlockValue
-            const blockValueSum = matchBlockValues.map((value) => BlockValue.repr(value)).sum()
+            const blocks = match.indices.map((index) => state.blockMap.get(index)!)
+            const upgradingBlock = blocks[0]
+            const maxBlockValue = blocks.map((block) => block.value).max()
+            const blockScoreSum = blocks.map((block) => block.score).sum()
 
             const mergeAnimations = mergingList.map(([sourceIndex, targetIndex]) => {
                 const animation = new BlockMergeAnimation(state.blockMap.get(sourceIndex)!, state.tweens.merge, { targetIndex })
@@ -77,11 +79,11 @@ export const createGame = (state: State) => {
             })
             const upgradeAnimation = new BlockUpgradeAnimation(upgradingBlock, state.tweens.upgrade)
             state.animationManager.onCompletion([upgradeAnimation], () => {
-                upgradingBlock.upgrade(BlockValue.next(maxBlockValue))
+                upgradingBlock.upgrade(maxBlockValue + 1)
             })
 
             state.animationManager.onCompletion(mergeAnimations, () => {
-                state.score += blockValueSum
+                state.score += blockScoreSum
             })
 
             await state.animationManager.wait(...mergeAnimations, upgradeAnimation)
@@ -192,7 +194,7 @@ export const createGame = (state: State) => {
             }
 
             const valueSlot = block.render(ctx, blockSlots[index])
-            blockValueText.render(ctx, valueSlot, `${BlockValue.repr(block.value)}`)
+            blockValueText.render(ctx, valueSlot, `${block.displayValue}`)
         })
     }
 
