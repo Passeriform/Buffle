@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 h2 {
     margin: 0;
 }
@@ -17,22 +21,5 @@ a:hover {
 }
 
 input {
-    margin: 0.25rem;
-    padding: 1rem 1rem;
-    font-size: 1.5rem;
-    text-align: center;
-    border: none;
-    border-radius: 0.5rem;
-    color: #ffffffde;
-    background-color: #ff9b84;
-}
-
-input:hover {
-    outline: 0.2rem solid #6b3c33;
-}
-
-input:focus {
-    background-color: #6b3c33;
-    outline: 0.2rem solid #6b3c33;
-    box-shadow: 0 0 0.3rem 0.05rem #1f1412 inset;
+    font-family: Quicksand, Helvetica, sans-serif;
 }

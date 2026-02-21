@@ -8,7 +8,7 @@
 :host {
     display: block;
     position: absolute;
-    border-radius: 0.8rem;
+    border-radius: 0.5vmin;
     background-color: #ff9b84;
     z-index: 1000;
     mask-repeat: no-repeat;

@@ -1,48 +1,81 @@
 /* TODO: Move to native CSS nesting */
 
-:host > table {
+:host {
+    --scale: 1vmin;
+
+    width: 100%;
+    height: 100%;
+}
+
+:host > .table {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100%;
     text-align: center;
     background-color: #6b3c33;
-    border: 0.5rem solid #6b3c33;
+    border: calc(0.5 * var(--scale)) solid #6b3c33;
     border-top: none;
-    border-spacing: 0.1rem;
-    border-radius: 0.5rem;
+    border-radius: calc(0.5 * var(--scale));
 }
 
-:host > table > tbody {
+:host > .table > .tr {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr;
+    gap: 1px;
+}
+
+:host > .table > .tr[data-slot] {
+    overflow-y: scroll;
+    scrollbar-width: none;
+}
+
+:host > .table > .tr > .td {
     background-color: #ff7e5e;
+    place-content: center;
 }
 
-:host > table > tbody > tr:first-of-type > td:first-of-type {
-    border-top-left-radius: 0.5rem;
-}
-
-:host > table > tbody > tr:first-of-type > td:last-of-type {
-    border-top-right-radius: 0.5rem;
-}
-
-:host > table > tbody > tr:last-of-type > td:first-of-type {
-    border-bottom-left-radius: 0.5rem;
-}
-
-:host > table > tbody > tr:last-of-type > td:last-of-type {
-    border-bottom-right-radius: 0.5rem;
-}
-
-:host > table > tbody > tr.highlight {
+:host > .table > .tr > .td.highlight {
     background-color: #ff9b84;
 }
 
-:host > table > thead > tr > th > h3 {
-    margin: 0.5rem;
+:host > .table > .tr:last-of-type {
+    border-radius: calc(0.5 * var(--scale));
 }
 
-:host > table > tbody > tr > td > h2 {
-    margin: 1rem 5vw;
+:host > .table > .tr > .th > h3 {
+    margin-block: calc(0.5 * var(--scale));
+    font-size: calc(1.5 * var(--scale));
+}
+
+:host > .table > .tr > .td > h2 {
+    margin-block: calc(1.5 * var(--scale));
+    font-size: calc(2 * var(--scale));
+}
+
+:host input {
+    margin: calc(0.25 * var(--scale));
+    padding: calc(1 * var(--scale));
+    font-size: calc(2 * var(--scale));
+    font-weight: 700;
+    text-align: center;
+    border: none;
+    border-radius: calc(0.5 * var(--scale));
+    color: #ffffffde;
+    background-color: #ff9b84;
+}
+
+:host input:hover {
+    outline: calc(0.2 * var(--scale)) solid #6b3c33;
+}
+
+:host input:focus {
+    background-color: #6b3c33;
+    outline: calc(0.2 * var(--scale)) solid #6b3c33;
+    box-shadow: 0 0 calc(0.3 * var(--scale)) calc(0.05 * var(--scale)) #1f1412 inset;
 }
 
 :host input[data-taunt] {
-    width: 25rem;
+    width: calc(25 * var(--scale));
 }
 
 @keyframes spin {
@@ -55,7 +88,7 @@
     width: 2rem;
     margin: 0 auto;
     margin-bottom: 1rem;
-    padding: 0.5rem;
+    padding: calc(0.5 * var(--scale));
     aspect-ratio: 1;
     border-radius: 50%;
     background: #6b3c33;

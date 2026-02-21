@@ -1,41 +1,33 @@
 <template>
-    <table>
-        <thead>
-            <tr>
-                <th><h3>Rank</h3></th>
-                <th><h3>Player Name</h3></th>
-                <th><h3>Score</h3></th>
-                <th><h3>Moves</h3></th>
-            </tr>
-        </thead>
-        <tbody data-slot></tbody>
-    </table>
+    <div class="table">
+        <div class="tr">
+            <div class="th"><h3>Rank</h3></div>
+            <div class="th"><h3>Player Name</h3></div>
+            <div class="th"><h3>Score</h3></div>
+            <div class="th"><h3>Moves</h3></div>
+        </div>
+        <div class="tr" data-slot></div>
+    </div class="table">
 
     <template data-loader>
-        <tr>
-            <td colspan="4" id="loader">
-                <div class="spinner"></div>
-                <h3 class="text">Loading...</h3>
-            </td>
-        </tr>
+        <div class="td" id="loader">
+            <div class="spinner"></div>
+            <h3 class="text">Loading...</h3>
+        </div>
     </template>
 
     <template data-row>
-        <tr>
-            <td><h2 data-rank></h2></td>
-            <td><h2 data-name></h2></td>
-            <td><h2 data-score></h2></td>
-            <td><h2 data-moves></h2></td>
-        </tr>
+        <div class="td"><h2 data-rank></h2></div>
+        <div class="td"><h2 data-name></h2></div>
+        <div class="td"><h2 data-score></h2></div>
+        <div class="td"><h2 data-moves></h2></div>
     </template>
 
     <template data-row-editable>
-        <tr class="highlight">
-            <td><h2 data-rank></h2></td>
-            <td><input id="name-input" maxlength="20" data-name /></td>
-            <buffle-popover anchor="name-input"><input data-taunt /></buffle-popover>
-            <td><h2 data-score></h2></td>
-            <td><h2 data-moves></h2></td>
-        </tr>
+        <div class="td highlight"><h2 data-rank></h2></div>
+        <div class="td highlight"><input id="name-input" maxlength="20" data-name /></div>
+        <buffle-popover anchor="name-input"><input data-taunt /></buffle-popover>
+        <div class="td highlight"><h2 data-score></h2></div>
+        <div class="td highlight"><h2 data-moves></h2></div>
     </template>
 </template>
