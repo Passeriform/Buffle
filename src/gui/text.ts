@@ -62,14 +62,12 @@ export class Text extends Widget<TextOptions, TextWidgetState> {
         ctx.fillStyle = this.options.color
         ctx.textAlign = "left"
         ctx.textBaseline = "top"
-        ctx.strokeStyle = "red"
 
         lines.forEach((line, idx) => {
             const [x, y] = [
                 layout.left + (layout.width - line.width) / 2,
                 layout.top + verticalOffset + idx * lineHeight,
             ]
-            ctx.strokeRect(x, y, line.width, line.height)
             ctx.fillText(line.text, x, y)
         })
 
