@@ -1,4 +1,5 @@
 import { type Layout, padLayout } from "../utility/layout"
+import { Text } from "./text"
 import { Widget, type WidgetOptions } from "./widget"
 
 export const BLOCK_PALLETTES = {
@@ -27,6 +28,7 @@ type BlockConfig = {
     pallette: readonly string[]
     displayValues: readonly string[]
     scoreValues: readonly number[]
+    textWidget: Text
 }
 
 type BlockOptions = WidgetOptions & {
@@ -39,6 +41,7 @@ export class Block extends Widget<BlockOptions & { background: string }> {
     private readonly pallette: readonly string[]
     private readonly displayValues: readonly string[]
     private readonly scoreValues: readonly number[]
+    private readonly textWidget: Text
 
     static equals(first: Block, second: Block) {
         return first._value === second._value
@@ -54,6 +57,7 @@ export class Block extends Widget<BlockOptions & { background: string }> {
         this.pallette = options.pallette ?? BLOCK_PALLETTES.COFFEE
         this.displayValues = options.displayValues ?? BLOCK_DISPLAY_SET.NUMBERS
         this.scoreValues = options.scoreValues ?? [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096] as const
+        this.textWidget = options.textWidget ?? new Text()
 
         this.makeDynamicOption("background", () => this.pallette[this._value])
     }
@@ -78,10 +82,12 @@ export class Block extends Widget<BlockOptions & { background: string }> {
             Math.max(0, this.resolveDependent(this.options.rounding, layout)),
         )
         ctx.fill()
+
+        this.textWidget.render(ctx, padLayout(layout, this.options.padding), this.displayValue)
     }
 
     override getSlots(layout: Layout) {
-        return padLayout(layout, this.options.padding)
+        return layout
     }
 
     get value() {

@@ -29,10 +29,9 @@ export const createGame = (state: State) => {
         rounding: "20%",
         pallette: BLOCK_PALLETTES.COFFEE,
         displayValues: BLOCK_DISPLAY_SET.NUMBERS,
-    })
-    // TODO: Move inside block widget
-    const blockValueText = new Text({
-        color: "#6a4537",
+        textWidget: new Text({
+            color: "#6a4537",
+        }),
     })
 
     // Movement
@@ -193,8 +192,7 @@ export const createGame = (state: State) => {
                 })
             }
 
-            const valueSlot = block.render(ctx, blockSlots[index])
-            blockValueText.render(ctx, valueSlot, `${block.displayValue}`)
+            block.render(ctx, blockSlots[index])
         })
     }
 
