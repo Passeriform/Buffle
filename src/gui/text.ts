@@ -11,23 +11,27 @@ type TextWidgetState = string
 
 // TODO: Convert to DOM based widget
 export class Text extends Widget<TextOptions, TextWidgetState> {
-    protected getTextBlockSize(ctx: CanvasRenderingContext2D, text: string, baseFontSize: number) {
-        ctx.font = `bold ${baseFontSize}px ${this.options.font}`
+    private measureLines(ctx: CanvasRenderingContext2D, text: string, fontSize: number) {
+        ctx.font = `bold ${fontSize}px ${this.options.font}`
 
-        return text.split("\n").reduce((acc, line) => {
-            const { width, actualBoundingBoxAscent, actualBoundingBoxDescent } = ctx.measureText(line)
+        return text.split("\n").map((line) => {
+            const metrics = ctx.measureText(line)
+            const ascent = metrics.actualBoundingBoxAscent ?? fontSize * 0.8
+            const descent = metrics.actualBoundingBoxDescent ?? fontSize * 0.2
             return {
-                width: Math.max(acc.width, width),
-                height: acc.height + actualBoundingBoxAscent + actualBoundingBoxDescent + (baseFontSize * this.options.lineHeight),
+                text: line,
+                width: metrics.width,
+                height: ascent + descent + fontSize * this.options.lineHeight,
             }
-        }, { width: 0, height: 0 })
+        })
     }
 
-    protected getFitFontSize(ctx: CanvasRenderingContext2D, layout: Layout, text: string) {
-        const testFontSize = 100
-        const { width: testBlockWidth, height: testBlockHeight } = this.getTextBlockSize(ctx, text, testFontSize)
-        const fontSize = Math.min(layout.width * testFontSize / testBlockWidth, layout.height * testFontSize / testBlockHeight)
-        return fontSize
+    private getFitFontSize(ctx: CanvasRenderingContext2D, layout: Layout, text: string) {
+        const probe = 100
+        const lines = this.measureLines(ctx, text, probe)
+        const blockWidth = lines.map(({ width }) => width).max()
+        const blockHeight = lines.map(({ height }) => height).sum()
+        return Math.min(layout.width * probe / blockWidth, layout.height * probe / blockHeight)
     }
 
     constructor(options: Partial<TextOptions> = {}) {
@@ -49,9 +53,9 @@ export class Text extends Widget<TextOptions, TextWidgetState> {
 
     override draw(ctx: CanvasRenderingContext2D, layout: Layout, state: TextWidgetState) {
         const fontSize = this.getFitFontSize(ctx, layout, state)
-        const lines = state.split("\n")
-        const sizes = lines.map((line) => this.getTextBlockSize(ctx, line, fontSize))
-        const verticalCenteringOffset = (layout.height - sizes.map(({ height }) => height).sum()) / 2
+        const lines = this.measureLines(ctx, state, fontSize)
+        const lineHeight = lines[0].height
+        const verticalOffset = (layout.height - (lineHeight * lines.length)) / 2
 
         ctx.globalAlpha = this.options.opacity
         ctx.font = `bold ${fontSize}px ${this.options.font}`
@@ -61,12 +65,12 @@ export class Text extends Widget<TextOptions, TextWidgetState> {
         ctx.strokeStyle = "red"
 
         lines.forEach((line, idx) => {
-            const [blockLeft, blockTop] = [
-                layout.left + (layout.width - sizes[idx].width) / 2,
-                layout.top + ((sizes[idx].height + this.options.lineHeight) * idx) + verticalCenteringOffset,
+            const [x, y] = [
+                layout.left + (layout.width - line.width) / 2,
+                layout.top + verticalOffset + idx * lineHeight,
             ]
-
-            ctx.fillText(line, blockLeft, blockTop)
+            ctx.strokeRect(x, y, line.width, line.height)
+            ctx.fillText(line.text, x, y)
         })
 
         // TODO: Add cleanup to restore canvas state post-render
