@@ -6,25 +6,23 @@ import { submitScore, updateScoreProfile } from "./api"
 import { getUserProfile, updateUserProfile } from "./auth/profile"
 import { type Direction, GameType } from "./constants"
 import { Block, BlockValue } from "./gui/block"
-import { Grid } from "./gui/grid"
-import { ResponsiveContainer } from "./gui/responsiveContainer"
+import { Container } from "./gui/container"
 import { Text } from "./gui/text"
 import { computeMatches } from "./matcher/matcher"
 import { computeMoves } from "./movement"
 import { computeNextBlockValue } from "./utility/difficulty"
-import { rootLayout } from "./utility/layout"
+import { fitLayout, layoutGrid, rootLayout } from "./utility/layout"
 
 export const createGame = (state: State) => {
     // GUI components
-    const board = new ResponsiveContainer({
+    const board = new Container({
         background: "#6b3c33",
         padding: "2%",
         rounding: "4%",
     })
-    const grid = new Grid({
-        gap: "8%",
+    const blockPlaceholder = new Container({
+        background: "#5a2f28",
         rounding: "20%",
-        dimensions: state.dimensions,
     })
     const block = new Block(BlockValue.TWO, {
         padding: "20%",
@@ -164,8 +162,11 @@ export const createGame = (state: State) => {
     const draw = (delta: DOMHighResTimeStamp, ctx: CanvasRenderingContext2D) => {
         const root = rootLayout(ctx.canvas)
 
-        const gridSlot = board.render(ctx, root)
-        const blockSlots = grid.render(ctx, gridSlot)
+        const gridSlot = board.render(ctx, fitLayout(root))
+        const blockSlots = layoutGrid(gridSlot, state.dimensions, "8%")
+        blockSlots.forEach((slot) => {
+            blockPlaceholder.render(ctx, slot)
+        })
 
         state.blockMap.forEach((block, index) => {
             if (!block) {

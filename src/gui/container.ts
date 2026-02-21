@@ -1,15 +1,13 @@
 import { type Layout, padLayout } from "../utility/layout"
 import { Widget, type WidgetOptions } from "./widget"
 
-type ResponsiveContainerOptions = WidgetOptions & {
+type ContainerOptions = WidgetOptions & {
     background: string
-    max?: number
-    min?: number
     rounding: `${number}%`
 }
 
-export class ResponsiveContainer extends Widget<ResponsiveContainerOptions> {
-    constructor(options: Partial<ResponsiveContainerOptions> = {}) {
+export class Container extends Widget<ContainerOptions> {
+    constructor(options: Partial<ContainerOptions> = {}) {
         super({
             background: "#6b3c3300",
             rounding: "0%",
@@ -18,24 +16,11 @@ export class ResponsiveContainer extends Widget<ResponsiveContainerOptions> {
     }
 
     override clone() {
-        return new ResponsiveContainer(this.baseOptions) as this
+        return new Container(this.baseOptions) as this
     }
 
     override getRenderLayouts(inLayout: Layout) {
-        const base = Math.min(inLayout.width, inLayout.height)
-        const minClamped = Math.max(this.options.min ?? base, base)
-        const maxClamped = Math.min(this.options.max ?? minClamped, minClamped)
-        const [xCenter, yCenter] = [
-            inLayout.left + (inLayout.width / 2),
-            inLayout.top + (inLayout.height / 2),
-        ]
-
-        return {
-            left: xCenter - (maxClamped / 2),
-            top: yCenter - (maxClamped / 2),
-            width: maxClamped,
-            height: maxClamped,
-        }
+        return inLayout
     }
 
     override draw(ctx: CanvasRenderingContext2D, layout: Layout) {
