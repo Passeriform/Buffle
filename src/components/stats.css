@@ -2,7 +2,8 @@
     --scale: 1vmin;
 
     display: flex;
-    justify-content: space-between;
+    place-content: space-between;
+    place-items: space-between;
     gap: calc(15 * var(--scale));
 }
 

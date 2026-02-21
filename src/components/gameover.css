@@ -1,11 +1,13 @@
 :host {
+    --scale: 1vmin;
+
     display: flex;
     position: absolute;
     top: 0;
     width: 100%;
     height: 100%;
-    align-items: center;
-    justify-content: center;
+    place-content: center;
+    place-items: center;
 }
 
 :host(:not([show])) {
@@ -16,33 +18,35 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    backdrop-filter: blur(0.5rem);
+    backdrop-filter: blur(calc(0.75 * var(--scale)));
 }
 
 :host > .splash {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    padding: 2rem;
-    min-width: 25rem;
-    align-items: center;
-    justify-content: center;
-    border: 0.5rem solid #6b3c33;
-    border-radius: 1rem;
+    gap: calc(2 * var(--scale));
+    max-width: 100%;
+    max-height: 100%;
+    padding: calc(2 * var(--scale));
+    place-content: center;
+    place-items: center;
+    border: calc(0.75 * var(--scale)) solid #6b3c33;
+    border-radius: calc(0.5 * var(--scale));
     background-color: #271612;
-    box-shadow: 0 0 1.2rem 0.5rem #1f1412;
+    box-shadow: 0 0 calc(1.2 * var(--scale)) calc(0.5 * var(--scale)) #1f1412;
     z-index: 1;
 }
 
 :host > .splash > .heading {
-    margin: 0 1rem;
-    font-size: clamp(4rem, 10vw, 10rem);
+    margin: 0 calc(1 * var(--scale));
+    font-size: calc(12 * var(--scale));
+    white-space: nowrap;
 }
 
 :host > .splash > .action {
-    margin: 2rem;
+    margin: calc(2 * var(--scale));
     font-family: monospace;
-    font-size: clamp(1.125rem, 2vw, 1.5rem);
+    font-size: calc(2.5 * var(--scale));
     font-weight: 500;
     color: #32a4ce;
     background: none;
