@@ -37,7 +37,7 @@ export class PopoverElement extends HTMLElement {
     }
 
     static get observedAttributes() {
-        return ["anchor"]
+        return ["anchor"] as const
     }
 
     #updateAnchor() {

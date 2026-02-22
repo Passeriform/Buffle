@@ -29,7 +29,7 @@ export class GameOverElement extends HTMLElement {
     }
 
     static get observedAttributes() {
-        return ["restart-key"]
+        return ["restart-key"] as const
     }
 
     #loadRestartKeys() {
