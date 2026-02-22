@@ -18,7 +18,7 @@ export class LeaderboardElement extends HTMLElement {
 
     readonly #root: ShadowRoot
     readonly #contentParent: HTMLElement
-    readonly #bodySlot: HTMLElement
+    // readonly #bodySlot: HTMLElement
     readonly #loaderElement: HTMLElement
     #loadedCount: number = 0
     #fetchLimit: number = 15
@@ -39,7 +39,7 @@ export class LeaderboardElement extends HTMLElement {
         ]
         this.#root.append(template.content.cloneNode(true))
         this.#contentParent = this.#root.querySelector(".content")!
-        this.#bodySlot = this.#root.querySelector("[data-slot]")!
+        // this.#bodySlot = this.#root.querySelector("[data-slot]")!
         this.#loaderElement = this.#root.querySelector("#loader")!
         this.#rowTemplate = this.#root.querySelector("[data-row]")!
         this.#editableRowTemplate = this.#root.querySelector("[data-row-editable]")!
