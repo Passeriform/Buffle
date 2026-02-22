@@ -9,13 +9,14 @@ export type LeaderboardData = {
     taunt: string
 }
 
-export const loadScores = async (gameType: GameType) => {
+export const loadScores = async (gameType: GameType, offset: number, limit: number) => {
     const dataApiUrl = new URL(import.meta.env.VITE_SUPABASE_ENDPOINT)
     dataApiUrl.pathname = `/rest/v1/${import.meta.env.VITE_LEADERBOARD_TABLE}`
     dataApiUrl.searchParams.append("select", "id,name,moves,score,taunt")
     dataApiUrl.searchParams.append("game_type", `eq.${gameType}`)
     dataApiUrl.searchParams.append("order", "score.desc")
-    dataApiUrl.searchParams.append("limit", "15")
+    dataApiUrl.searchParams.append("limit", `${limit}`)
+    dataApiUrl.searchParams.append("offset", `${offset}`)
 
     try {
         const response = await fetch(dataApiUrl, {

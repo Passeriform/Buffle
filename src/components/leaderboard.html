@@ -1,20 +1,19 @@
 <template>
-    <div class="table">
-        <div class="tr">
+    <section class="table">
+        <div class="header">
             <div class="th"><h3>Rank</h3></div>
             <div class="th"><h3>Player Name</h3></div>
             <div class="th"><h3>Score</h3></div>
             <div class="th"><h3>Moves</h3></div>
         </div>
-        <div class="tr" data-slot></div>
-    </div class="table">
-
-    <template data-loader>
-        <div class="td" id="loader">
-            <div class="spinner"></div>
-            <h3 class="text">Loading...</h3>
+        <div class="content">
+            <div data-slot></div>
+            <div class="td" id="loader" show>
+                <div class="spinner"></div>
+                <h3 class="text">Loading...</h3>
+            </div>
         </div>
-    </template>
+    </section>
 
     <template data-row>
         <div class="td"><h2 data-rank></h2></div>

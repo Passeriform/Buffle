@@ -18,36 +18,63 @@
     border-radius: calc(0.5 * var(--scale));
 }
 
-:host > .table > .tr {
+:host > .table > .header,
+:host > .table > .content {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr 1fr;
     gap: 1px;
 }
 
-:host > .table > .tr[data-slot] {
+:host > .table > .content {
+    border-radius: calc(0.5 * var(--scale));
     overflow-y: scroll;
     scrollbar-width: none;
 }
 
-:host > .table > .tr > .td {
+:host > .table > .content > .td {
     background-color: #ff7e5e;
     place-content: center;
 }
 
-:host > .table > .tr > .td.highlight {
+:host > .table > .content > .td.highlight {
     background-color: #ff9b84;
 }
 
-:host > .table > .tr:last-of-type {
-    border-radius: calc(0.5 * var(--scale));
+:host #loader {
+    grid-column: span 4;
+    padding: 1rem;
 }
 
-:host > .table > .tr > .th > h3 {
+:host #loader:not([show]) {
+    display: none;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(1turn);
+    }
+}
+
+:host #loader > .spinner {
+    width: 2rem;
+    margin: 0 auto;
+    margin-bottom: 0.5rem;
+    padding: calc(0.5 * var(--scale));
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #6b3c33;
+    --spin-gradient: conic-gradient(#0000 5%, #000), linear-gradient(#000 0 0) content-box;
+    mask: var(--spin-gradient);
+    mask-composite: subtract;
+    animation: spin 1s infinite linear;
+}
+
+:host > .table > .header > .th > h3 {
     margin-block: calc(0.5 * var(--scale));
     font-size: calc(1.5 * var(--scale));
 }
 
-:host > .table > .tr > .td > h2 {
+:host > .table > .content > .td > h2 {
     margin-block: calc(1.5 * var(--scale));
     font-size: calc(2 * var(--scale));
 }
@@ -75,25 +102,5 @@
 }
 
 :host input[data-taunt] {
-    width: calc(25 * var(--scale));
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(1turn);
-    }
-}
-
-:host #loader > .spinner {
-    width: 2rem;
-    margin: 0 auto;
-    margin-bottom: 1rem;
-    padding: calc(0.5 * var(--scale));
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: #6b3c33;
-    --spin-gradient: conic-gradient(#0000 5%, #000), linear-gradient(#000 0 0) content-box;
-    mask: var(--spin-gradient);
-    mask-composite: subtract;
-    animation: spin 1s infinite linear;
+    width: calc(30 * var(--scale));
 }

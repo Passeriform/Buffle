@@ -15,3 +15,16 @@ export const parseStyleSheet = (rawCss: string) => {
     sheet.replaceSync(rawCss)
     return sheet
 }
+
+export const spliceChildren = (parent: HTMLElement, index: number, deleteCount: number, ...additional: HTMLElement[]) => {
+    const children = Array.from(parent.children)
+    const removed = children.splice(index, deleteCount, ...additional)
+    removed.forEach((child) => {
+        parent.removeChild(child)
+    })
+
+    const nextSibling = parent.children[index] || null
+    additional.forEach((child) => {
+        parent.insertBefore(child, nextSibling)
+    })
+}

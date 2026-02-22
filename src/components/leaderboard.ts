@@ -1,6 +1,6 @@
 import type { GameType } from "../constants"
 import { type LeaderboardData, loadScores } from "../api"
-import { parseStyleSheet, parseTemplate } from "../utility/dom"
+import { parseStyleSheet, parseTemplate, spliceChildren } from "../utility/dom"
 import rawElementsStyleSheet from "./elements.css?raw"
 import rawStyleSheet from "./leaderboard.css?raw"
 import rawHtml from "./leaderboard.html?raw"
@@ -17,14 +17,17 @@ export class LeaderboardElement extends HTMLElement {
     static TAG = "buffle-leaderboard" as const
 
     readonly #root: ShadowRoot
-    readonly #bodySlot: HTMLTableSectionElement
-    #editableId?: number
+    readonly #contentParent: HTMLElement
+    readonly #bodySlot: HTMLElement
+    readonly #loaderElement: HTMLElement
+    #loadedCount: number = 0
+    #fetchLimit: number = 15
+    #runId?: number
 
-    #loaderTemplate: HTMLTemplateElement
     #rowTemplate: HTMLTemplateElement
     #editableRowTemplate: HTMLTemplateElement
 
-    #data: LeaderboardData[] = []
+    #overscrollObserver: IntersectionObserver
 
     constructor() {
         super()
@@ -35,14 +38,23 @@ export class LeaderboardElement extends HTMLElement {
             parseStyleSheet(rawElementsStyleSheet),
         ]
         this.#root.append(template.content.cloneNode(true))
+        this.#contentParent = this.#root.querySelector(".content")!
         this.#bodySlot = this.#root.querySelector("[data-slot]")!
-        this.#loaderTemplate = this.#root.querySelector("[data-loader]")!
+        this.#loaderElement = this.#root.querySelector("#loader")!
         this.#rowTemplate = this.#root.querySelector("[data-row]")!
         this.#editableRowTemplate = this.#root.querySelector("[data-row-editable]")!
+
+        this.#overscrollObserver = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) {
+                this.#fetchLimit += 15
+                this.#loadData()
+            }
+        }, { root: this.#contentParent })
+        this.#overscrollObserver.observe(this.#loaderElement)
     }
 
     static get observedAttributes() {
-        return ["game-type"]
+        return ["game-type", "autoscroll"] as const
     }
 
     #addInputListeners = (input: HTMLInputElement, event: string) => {
@@ -66,19 +78,15 @@ export class LeaderboardElement extends HTMLElement {
         })
     }
 
-    #renderLoader() {
-        this.#bodySlot.replaceChildren(this.#loaderTemplate.content.cloneNode(true))
-    }
+    #getDataRows(data: LeaderboardData[], seedRank: number) {
+        return data.map(({ id, name, score, moves, taunt }, idx) => {
+            const row = (id === this.#runId ? this.#editableRowTemplate : this.#rowTemplate).content.cloneNode(true) as HTMLElement
 
-    #renderData() {
-        const rows = this.#data.map(({ id, name, score, moves, taunt }, idx) => {
-            const row = (id === this.#editableId ? this.#editableRowTemplate : this.#rowTemplate).content.cloneNode(true) as DocumentFragment
-
-            row.querySelector("[data-rank]")!.textContent = `${idx + 1}`
+            row.querySelector("[data-rank]")!.textContent = `${seedRank + idx + 1}`
             row.querySelector("[data-score]")!.textContent = `${score}`
             row.querySelector("[data-moves]")!.textContent = `${moves}`
 
-            if (id === this.#editableId) {
+            if (id === this.#runId) {
                 const nameInput = row.querySelector("[data-name]")! as HTMLInputElement
                 nameInput.value = name
                 this.#addInputListeners(nameInput, "update:name")
@@ -103,32 +111,53 @@ export class LeaderboardElement extends HTMLElement {
 
             return row
         })
-
-        this.#bodySlot.replaceChildren(...rows)
     }
 
-    async #loadData() {
-        this.#renderLoader()
+    async #loadData(force: boolean = false) {
+        const offset = force ? 0 : this.#loadedCount
+        const loadedScores = await loadScores(this.getAttribute("game-type")! as GameType, offset, this.#fetchLimit - offset)
 
-        this.#data = await loadScores(this.getAttribute("game-type")! as GameType)
+        if (!loadedScores.length) {
+            this.#loaderElement.removeAttribute("show")
+        }
 
-        this.#renderData()
+        // TODO: Replace bodySlot instead of splicing contentParent
+        const lastChildIndex = force ? 0 : this.#contentParent.childElementCount - 1
+        spliceChildren(this.#contentParent, lastChildIndex, this.#contentParent.childElementCount - lastChildIndex - 1, ...this.#getDataRows(loadedScores, offset))
+        this.#loadedCount = offset + loadedScores.length
+
+        if (this.hasAttribute("autoscroll")) {
+            this.#scrollToRun()
+        }
+    }
+
+    #scrollToRun() {
+        const runElement = this.#contentParent.querySelector("input#name-input")
+
+        if (runElement) {
+            runElement.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" })
+            return
+        }
+
+        this.#contentParent.scroll({ behavior: "smooth", top: this.#contentParent.scrollHeight })
     }
 
     /* eslint-disable-next-line accessor-pairs -- Property should only be set programmatically */
-    set editableId(value: number | undefined) {
-        this.#editableId = value
+    set runId(value: number | undefined) {
+        this.#runId = value
     }
 
     refresh() {
-        this.#loadData()
+        this.#loadData(true)
     }
 
     connectedCallback() {
-        this.#loadData()
+        this.#loadData(true)
     }
 
-    attributeChangedCallback() {
-        this.#loadData()
+    attributeChangedCallback(name: typeof LeaderboardElement.observedAttributes[number]) {
+        if (name === "game-type") {
+            this.#loadData(true)
+        }
     }
 }

@@ -213,7 +213,7 @@ export const createGame = (state: State) => {
         const leaderboardElement = document.querySelector("buffle-leaderboard")!
 
         leaderboardElement.refresh()
-        leaderboardElement.editableId = runId
+        leaderboardElement.runId = runId
 
         leaderboardElement.addEventListener("update:name", (event) => {
             updateScoreProfile({ id: runId, name: event.detail })
