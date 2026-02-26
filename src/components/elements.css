@@ -2,17 +2,15 @@
     box-sizing: border-box;
 }
 
-h2 {
-    margin: 0;
-}
-
+h1,
+h2,
 h3 {
     margin: 0;
 }
 
 a {
-    font-weight: 500;
     color: #0a85d9;
+    font-weight: 500;
     text-decoration: inherit;
 }
 
@@ -22,4 +20,8 @@ a:hover {
 
 input {
     font-family: Quicksand, Helvetica, sans-serif;
+}
+
+button {
+    padding: 0;
 }

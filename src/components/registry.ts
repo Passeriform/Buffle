@@ -1,5 +1,6 @@
 import { GameOverElement } from "./gameover"
 import { LeaderboardElement } from "./leaderboard"
+import { MenuElement } from "./menu"
 import { PopoverElement } from "./popover"
 import { StatsElement } from "./stats"
 
@@ -13,6 +14,7 @@ const additionalElements = [
     LeaderboardElement,
     PopoverElement,
     StatsElement,
+    MenuElement,
 ] as const satisfies CustomElementCtor[]
 
 type ElementUnion = typeof additionalElements[number]
@@ -32,6 +34,7 @@ type CustomElementEventMap =
     & LeaderboardElement.EVENTS
     & PopoverElement.EVENTS
     & StatsElement.EVENTS
+    & MenuElement.EVENTS
 
 /* eslint-disable ts/consistent-type-definitions -- Extending global HTML attributes requires interface for declaration merging */
 
