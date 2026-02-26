@@ -1,0 +1,24 @@
+<template>
+    <input id="trigger" type="image" src="/menu.png" alt="Menu" />
+    <div id="board">
+        <h1 class="header">🙤 BUFFLE 🙦</h1>
+        <div class="content">
+            <h2 class="subheader">Game Mode</h2>
+            <div id="game-mode-container" class="option-container" data-game-mode-container></div>
+            <h2 class="subheader">Block Set</h2>
+            <div id="block-set-container" class="option-container" data-block-set-container></div>
+        </div>
+    </div>
+
+    <template data-game-mode-option>
+        <button class="option">
+            <span data-game-mode-text></span>
+            <span data-ellipses></span>
+            <span data-end-label></span>
+        </button>
+    </template>
+
+    <template data-block-set-option>
+        <button class="option"></button>
+    </template>
+</template>

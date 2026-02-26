@@ -1,0 +1,159 @@
+:host {
+    --scale: 1vmin;
+    --trigger-size: calc(10 * var(--scale));
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+    width: 100%;
+    padding: var(--scale);
+    font-family: "Leckerli One", cursive;
+    transition: all 0.2s cubic-bezier(0.42, 0, 0.58, 1);
+    overflow: hidden;
+}
+
+:host > #trigger {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+    width: var(--trigger-size);
+    height: var(--trigger-size);
+    margin: calc(2 * var(--scale));
+    opacity: 1;
+    filter: drop-shadow(0 0 calc(0.25 * var(--scale)) black);
+    transition: all 0.2s cubic-bezier(0.42, 0, 0.58, 1);
+    pointer-events: auto;
+}
+
+:host([show]) > #trigger {
+    opacity: 0;
+    pointer-events: none;
+}
+
+:host button:disabled {
+    cursor: default;
+}
+
+:host > #board {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--scale);
+    place-items: stretch;
+    width: 100%;
+    /* TODO: Convert to background instead of border-image */
+    border: calc(2 * var(--scale)) solid transparent;
+    border-image: url(/wood_texture.jpg) 500;
+    padding: var(--scale);
+    background-image: url(/slate_texture.jpg);
+    box-shadow:
+        0 0 calc(0.5 * var(--scale)) calc(0.25 * var(--scale)) #1f1412,
+        0 0 calc(0.5 * var(--scale)) calc(0.25 * var(--scale)) #1f1412 inset;
+    transform: translateX(100%);
+    transition: all 0.2s cubic-bezier(0.42, 0, 0.58, 1);
+    overflow: hidden;
+}
+
+:host([show]) > #board {
+    transform: none;
+}
+
+:host > #board > .header,
+:host > #board > .content > .subheader {
+    background-image: url(/slate_texture.jpg);
+    background-clip: text;
+    color: transparent;
+    font-weight: 400;
+    filter: brightness(5) contrast(1.5);
+}
+
+:host > #board > .header {
+    place-self: center;
+    font-size: calc(6 * var(--scale));
+}
+
+:host > #board > .content {
+    padding-left: calc(2.5 * var(--scale));
+}
+
+:host > #board > .content > .subheader {
+    font-size: calc(3 * var(--scale));
+}
+
+:host > #board > .content > .option-container {
+    display: flex;
+    flex-direction: row;
+    gap: calc(0.5 * var(--scale));
+    margin: var(--scale);
+}
+
+:host > #board > .content > .option-container > .option {
+    appearance: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+:host > #board > .content > .option-container > .option:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+:host > #board > .content > #game-mode-container {
+    flex-direction: column;
+}
+
+:host > #board > .content > #game-mode-container > .option {
+    display: flex;
+    font-family: "Leckerli One", cursive;
+    font-size: calc(1.5 * var(--scale));
+    font-weight: 400;
+    text-align: left;
+    overflow: hidden;
+}
+
+:host > #board > .content > #game-mode-container > .option:not(:disabled):hover {
+    text-shadow: 0 0 calc(0.1 * var(--scale)) white;
+}
+
+:host > #board > .content > #game-mode-container > .option > * {
+    display: block;
+    flex: 0;
+    background-image: url(/slate_texture.jpg);
+    background-clip: text;
+    color: transparent;
+    filter: brightness(5) contrast(1.5);
+    white-space: nowrap;
+}
+
+:host > #board > .content > #game-mode-container > .option > * {
+    padding-inline: 0.25ch;
+}
+
+:host > #board > .content > #game-mode-container > .option > [data-ellipses] {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+:host > #board > .content > #block-set-container {
+    gap: calc(2 * var(--scale));
+}
+
+:host > #board > .content > #block-set-container > .option {
+    width: calc(4 * var(--scale));
+    height: calc(4 * var(--scale));
+    border-radius: var(--scale);
+    background-image: url(/slate_texture.jpg);
+    color: #111111;
+    font-family: "Quicksand", Helvetica, sans-serif;
+    font-size: calc(2.5 * var(--scale));
+    font-weight: 800;
+    filter: brightness(5) contrast(1.5);
+}
+
+:host > #board > .content > #block-set-container > .option:hover {
+    filter: brightness(5) contrast(1.5) drop-shadow(0 0 calc(0.25 * var(--scale)) white);
+}
