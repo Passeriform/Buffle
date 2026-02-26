@@ -151,7 +151,10 @@ export const createGame = (state: State) => {
         await spawn()
 
         // Eager check for creating matches on spawn
-        await merge(direction)
+        let eagerMergePerformed = false
+        do {
+            eagerMergePerformed = Boolean(await merge(direction))
+        } while (eagerMergePerformed)
 
         // Check for state end
         if (state.blockMap.size === state.blockMap.maxSize) {
