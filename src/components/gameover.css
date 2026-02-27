@@ -1,13 +1,13 @@
 :host {
     --scale: 1vmin;
 
-    display: flex;
     position: absolute;
     top: 0;
-    width: 100%;
-    height: 100%;
+    display: flex;
     place-content: center;
     place-items: center;
+    width: 100%;
+    height: 100%;
 }
 
 :host(:not([show])) {
@@ -25,13 +25,13 @@
     display: flex;
     flex-direction: column;
     gap: calc(2 * var(--scale));
-    max-width: 100%;
-    max-height: 100%;
-    padding: calc(2 * var(--scale));
     place-content: center;
     place-items: center;
+    max-width: 100%;
+    max-height: 100%;
     border: calc(0.75 * var(--scale)) solid #6b3c33;
     border-radius: calc(0.5 * var(--scale));
+    padding: calc(2 * var(--scale));
     background-color: #271612;
     box-shadow: 0 0 calc(1.2 * var(--scale)) calc(0.5 * var(--scale)) #1f1412;
     z-index: 1;
@@ -45,12 +45,12 @@
 
 :host > .splash > .action {
     margin: calc(2 * var(--scale));
+    border: none;
+    background: none;
+    color: #32a4ce;
     font-family: monospace;
     font-size: calc(2.5 * var(--scale));
     font-weight: 500;
-    color: #32a4ce;
-    background: none;
-    border: none;
     cursor: pointer;
 }
 

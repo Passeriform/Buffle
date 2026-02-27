@@ -50,10 +50,7 @@ export class GameOverElement extends HTMLElement {
             return
         }
 
-        this.dispatchEvent(new CustomEvent("restart", {
-            bubbles: true,
-            composed: true,
-        }))
+        this.dispatchEvent(new CustomEvent("restart"))
     }
 
     connectedCallback() {

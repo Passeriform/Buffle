@@ -31,6 +31,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     state.addEventListener("game:reset", () => {
         state.start()
     })
+    document.querySelector("buffle-menu")!.addEventListener("select:game-type", () => {
+        init()
+    })
+    document.querySelector("buffle-menu")!.addEventListener("select:block-set", (event) => {
+        state.blockDisplaySet = event.detail
+    })
 
     state.start()
 

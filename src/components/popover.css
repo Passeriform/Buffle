@@ -6,8 +6,8 @@
 }
 
 :host {
-    display: block;
     position: absolute;
+    display: block;
     border-radius: 0.5vmin;
     background-color: #ff9b84;
     z-index: 1000;

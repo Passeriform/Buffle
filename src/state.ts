@@ -1,5 +1,7 @@
-import type { Block } from "./gui/block"
 import { AnimationManager, Easing, Tween } from "./animation"
+import { Block } from "./gui/block"
+import { Container } from "./gui/container"
+import { Text } from "./gui/text"
 import { SparseMatrix } from "./utility/sparseMatrix"
 
 type Config = {
@@ -10,6 +12,11 @@ type Config = {
         merge: Tween
         upgrade: Tween
         spawn: Tween
+    }
+    widgets: {
+        board: Container
+        placeholder: Container
+        block: Block
     }
 }
 
@@ -34,6 +41,26 @@ export class State extends EventTarget {
                 merge: new Tween(300 / config.gameSpeed, Easing.EASE_IN_OUT),
                 upgrade: new Tween(300 / config.gameSpeed, Easing.LINEAR),
                 spawn: new Tween(200 / config.gameSpeed, Easing.EASE_IN_OUT),
+            },
+            widgets: {
+                board: new Container({
+                    background: "#6b3c33",
+                    padding: "2%",
+                    rounding: "4%",
+                }),
+                placeholder: new Container({
+                    background: "#5a2f28",
+                    rounding: "20%",
+                }),
+                block: new Block(0, {
+                    padding: "20%",
+                    rounding: "20%",
+                    pallette: "COFFEE",
+                    displaySet: "SHAPES",
+                    textWidget: new Text({
+                        color: "#6a4537",
+                    }),
+                }),
             },
             ...config,
         }
@@ -62,6 +89,22 @@ export class State extends EventTarget {
         return this.state.animationManager
     }
 
+    /* eslint-disable-next-line accessor-pairs -- Re-exposed convenience utility to update pallette */
+    set blockPallette(pallette: keyof typeof Block.PALLETTES) {
+        this.config.widgets.block.pallette = pallette
+        this.blockMap.forEach((block) => {
+            block.pallette = pallette
+        })
+    }
+
+    /* eslint-disable-next-line accessor-pairs -- Re-exposed convenience utility to update pallette */
+    set blockDisplaySet(displaySet: keyof typeof Block.DISPLAY_SETS) {
+        this.config.widgets.block.displaySet = displaySet
+        this.blockMap.forEach((block) => {
+            block.displaySet = displaySet
+        })
+    }
+
     get score() {
         return this.state.score
     }
@@ -82,6 +125,10 @@ export class State extends EventTarget {
 
     get isGameOver() {
         return this.state.isGameOver
+    }
+
+    getWidget<K extends keyof Config["widgets"]>(name: K) {
+        return this.config.widgets[name]
     }
 
     start() {

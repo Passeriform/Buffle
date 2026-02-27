@@ -16,7 +16,7 @@ export declare namespace MenuElement {
 export class MenuElement extends HTMLElement {
     static TAG = "buffle-menu" as const
 
-    static DISABLED_GAME_MODES = [GameType.ARCADE, GameType.CAMPAIGN, GameType.BLITZ]
+    static DISABLED_GAME_MODES = [GameType.BLITZ, GameType.CAMPAIGN]
 
     readonly #root: ShadowRoot
     #gameModeOptionTemplate: HTMLTemplateElement

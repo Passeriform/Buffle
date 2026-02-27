@@ -11,11 +11,11 @@
     display: grid;
     grid-template-rows: auto 1fr;
     height: 100%;
-    text-align: center;
-    background-color: #6b3c33;
     border: calc(0.5 * var(--scale)) solid #6b3c33;
     border-top: none;
     border-radius: calc(0.5 * var(--scale));
+    background-color: #6b3c33;
+    text-align: center;
 }
 
 :host > .table > .header,
@@ -32,8 +32,8 @@
 }
 
 :host > .table > .content > .td {
-    background-color: #ff7e5e;
     place-content: center;
+    background-color: #ff7e5e;
 }
 
 :host > .table > .content > .td.highlight {
@@ -56,14 +56,15 @@
 }
 
 :host #loader > .spinner {
+    --spin-gradient: conic-gradient(#0000 5%, #000), linear-gradient(#000 0 0) content-box;
+
     width: 2rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
     margin: 0 auto;
     margin-bottom: 0.5rem;
     padding: calc(0.5 * var(--scale));
-    aspect-ratio: 1;
-    border-radius: 50%;
     background: #6b3c33;
-    --spin-gradient: conic-gradient(#0000 5%, #000), linear-gradient(#000 0 0) content-box;
     mask: var(--spin-gradient);
     mask-composite: subtract;
     animation: spin 1s infinite linear;
@@ -80,15 +81,15 @@
 }
 
 :host input {
+    border: none;
+    border-radius: calc(0.5 * var(--scale));
     margin: calc(0.25 * var(--scale));
     padding: calc(1 * var(--scale));
+    background-color: #ff9b84;
+    color: #ffffffde;
     font-size: calc(2 * var(--scale));
     font-weight: 700;
     text-align: center;
-    border: none;
-    border-radius: calc(0.5 * var(--scale));
-    color: #ffffffde;
-    background-color: #ff9b84;
 }
 
 :host input:hover {
@@ -96,8 +97,8 @@
 }
 
 :host input:focus {
-    background-color: #6b3c33;
     outline: calc(0.2 * var(--scale)) solid #6b3c33;
+    background-color: #6b3c33;
     box-shadow: 0 0 calc(0.3 * var(--scale)) calc(0.05 * var(--scale)) #1f1412 inset;
 }
 
