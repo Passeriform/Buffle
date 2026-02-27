@@ -56,7 +56,7 @@ export class State extends EventTarget {
                     padding: "20%",
                     rounding: "20%",
                     pallette: "COFFEE",
-                    displaySet: "SHAPES",
+                    displaySet: "NUMBERS",
                     textWidget: new Text({
                         color: "#6a4537",
                     }),
