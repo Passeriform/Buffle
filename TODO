@@ -2,8 +2,13 @@
 
 ☐ Celebration on breaching a block
 ☐ Celebration on high score breach
-☐ Make application responsive for mobile devices
 ☐ Extract into ChiselJS library
+
+Game Modes:
+    ☐ Blitz: Time attack
+    ☐ Campaign mode with prestige mechanics
+    ☐ Tetris mode with timed block spawn, gravity and next block preview
+    ☐ Pong mode with only up and down controls and alternating left and right moves
 
 Recommendations:
     ☐ Raised blocks for visual clarity

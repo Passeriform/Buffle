@@ -2,9 +2,9 @@
     --scale: 1vmin;
 
     display: flex;
+    gap: calc(15 * var(--scale));
     place-content: space-between;
     place-items: space-between;
-    gap: calc(15 * var(--scale));
 }
 
 :host > .block {

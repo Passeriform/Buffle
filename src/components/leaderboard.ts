@@ -70,11 +70,7 @@ export class LeaderboardElement extends HTMLElement {
         })
         input.addEventListener("blur", () => {
             input.setSelectionRange(0, 0)
-            this.dispatchEvent(new CustomEvent(event, {
-                bubbles: true,
-                composed: true,
-                detail: input.value,
-            }))
+            this.dispatchEvent(new CustomEvent(event, { detail: input.value }))
         })
     }
 
