@@ -9,6 +9,8 @@ Game Modes:
     ☐ Campaign mode with prestige mechanics
     ☐ Tetris mode with timed block spawn, gravity and next block preview
     ☐ Pong mode with only up and down controls and alternating left and right moves
+    ☐ Daily seeded runs with fixed block spawns
+    ☐ Elimination mode where you need to make a match every X seconds or lose
 
 Recommendations:
     ☐ Raised blocks for visual clarity
